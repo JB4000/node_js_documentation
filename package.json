@@ -1,0 +1,12 @@
+{
+  "name": "node_js_documentation",
+  "version": "0.0.1",
+  "description": "Documentation of learned material in Node.js course",
+  "license": "ISC",
+  "author": "Janus",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
