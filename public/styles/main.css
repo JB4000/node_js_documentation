@@ -1,3 +1,20 @@
-h1 {
-    background-color: red;
+:root {
+    --pico-font-size: 90%;
+}
+
+header {
+    text-align: center;
+}
+
+header nav {
+    display: flex;
+    justify-content: center;
+}
+
+header nav a {
+    white-space: nowrap;
+}
+
+header nav ul {
+    flex-wrap: wrap;
 }
