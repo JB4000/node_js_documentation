@@ -18,3 +18,9 @@ header nav a {
 header nav ul {
     flex-wrap: wrap;
 }
+
+.subject-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 2rem;
+}
