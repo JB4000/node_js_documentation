@@ -1,0 +1,837 @@
+<article class="documentation-content">
+
+    <section>
+        <h1>Frontend</h1>
+    </section>
+
+
+    <section>
+        <h2 id="rendering">Server-side rendering and client-side rendering</h2>
+
+        <p>
+            When we build a website, we need to decide where the
+            HTML content should be constructed.
+        </p>
+
+        <p>
+            Two approaches are server-side rendering (SSR) and
+            client-side rendering (CSR).
+        </p>
+
+        <h3>Server-side rendering (SSR)</h3>
+
+        <p>
+            With SSR, the server constructs the HTML before sending
+            it to the browser.
+        </p>
+
+        <p>
+            The browser receives a page where the content is already
+            included in the HTML. It can display that content
+            without first having to use JavaScript to create it.
+        </p>
+
+        <p>
+            The server might read HTML files, combine
+            components, or insert data into a page before sending
+            the response.
+        </p>
+
+        <p>
+            SSR does not mean that the server must construct the HTML
+            again for every request. We can also construct a page once
+            and reuse it for several requests, if that matches the application.
+        </p>
+
+        <h3>Client-side rendering (CSR)</h3>
+
+        <p>
+            With CSR, JavaScript running in the browser constructs
+            or updates the content of the page.
+        </p>
+
+        <p>
+            The server can send an initial HTML document that contains
+            little content. JavaScript can then fetch data from an API
+            and use it to create HTML elements and update the DOM.
+        </p>
+
+        <p>
+            This means the browser does more of the work.
+        </p>
+
+        <p>
+            CSR can be useful for applications where the user
+            interacts with the page and only parts of the content
+            need to change.
+        </p>
+
+        <h3>Performance and resource usage</h3>
+
+        <p>
+            SSR and CSR use resources differently.
+        </p>
+
+        <p>
+            With SSR, the server does the work of constructing the
+            HTML. This can make the initial content appear sooner
+            because the browser receives HTML that is already prepared.
+        </p>
+
+        <p>
+            But constructing HTML for many requests can also require
+            more work from the server.
+        </p>
+
+        <p>
+            With CSR, the browser does more of the rendering work.
+            It needs to download JavaScript code, execute it, and
+            fetch data before the content is displayed.
+        </p>
+
+        <p>
+            This can delay the initial display of useful content.
+            But after the application has loaded, JavaScript can
+            update smaller parts of the page without loading a
+            new HTML document.
+        </p>
+
+        <p>
+            The choice of apporach depends on the
+            application, the amount of JavaScript, the server etc.
+        </p>
+
+        <h3>Search engine optimization (SEO)</h3>
+
+        <p>
+            Search engines need to understand the content of a
+            website so they can index it.
+        </p>
+
+        <p>
+            With SSR, the content is already included in the HTML
+            response. This makes it easier for search engines to
+            check the content without having to execute JavaScript first.
+        </p>
+
+        <p>
+            With CSR, some content might only appear after JavaScript
+            has been executed. Some search engines can execute JavaScript,
+            but it can make indexing more complicated.
+        </p>
+
+        <p>
+            This is one reason SSR can be useful for websites where
+            search engine visibility is important.
+        </p>
+
+        <h3>Combining SSR and CSR</h3>
+
+        <p>
+            We do not have to choose only one approach for an
+            entire website.
+        </p>
+
+        <p>
+            A server can send HTML containing the initial content,
+            while browser JavaScript handles later updates and
+            interactions.
+        </p>
+
+        <p>
+            For example, a product page could be rendered on the
+            server so the product information is available immediately.
+            JavaScript could then update the selections or shopping cart without
+            reloading the page.
+        </p>
+
+        <p>
+            The important difference is where the content is
+            constructed and when the work happens.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="fetch">Fetch and data from the server</h2>
+
+        <p>
+            The frontend can use <code>fetch()</code> to make HTTP requests to the server.
+            <code>fetch()</code> returns a Promise so the browser can continue running
+            other code while waiting for the response.
+        </p>
+
+        <pre><code>
+            fetch('/api/animals')
+                .then(response => response.json())
+                .then(result => console.log(result.data));
+        </code></pre>
+
+        <p>
+            The first <code>.then()</code> receives the HTTP Response object.
+            <code>response.json()</code> reads and parses the JSON response body and also
+            returns a Promise. The next <code>.then()</code> receives the parsed JavaScript
+            value.
+        </p>
+
+        <p>
+            If the server sends an object like this:
+        </p>
+
+        <pre><code>
+            res.send({
+                data: animals
+            });
+        </code></pre>
+
+        <p>
+            then the frontend can access the animals through <code>result.data</code>.
+        </p>
+
+        <section>
+            <h3>Implicit and explicit return</h3>
+
+            <p>
+                An arrow function without curly braces implicitly returns the expression.
+                This means that the Promise returned by <code>response.json()</code> is
+                returned from the callback too.
+            </p>
+
+            <pre><code>
+            .then(response => response.json())
+        </code></pre>
+
+            <p>
+                If curly braces are used for the function body, <code>return</code> has to
+                be written explicitly.
+            </p>
+
+            <pre><code>
+            .then(response => {
+                return response.json();
+            })
+        </code></pre>
+        </section>
+
+        <section>
+            <h3>Sending JSON with POST</h3>
+
+            <p>
+                <code>fetch()</code> can take a second argument containing options for the
+                request. When we want to send a JavaScript object as JSON, we can specify the
+                HTTP method, the content type and the request body.
+            </p>
+
+            <pre><code>
+            const newAnimal = {
+                name: 'Otter',
+                age: 4
+            };
+
+            fetch('/api/animals', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newAnimal)
+            })
+                .then(response => response.json())
+                .then(result => console.log(result.data));
+        </code></pre>
+
+            <p>
+                The second argument to <code>fetch()</code> is still a JavaScript object.
+                <code>'Content-Type'</code> is written with quotes because the property name
+                contains a hyphen.
+            </p>
+
+            <p>
+                <code>JSON.stringify()</code> converts the JavaScript object into JSON text
+                before it is sent in the request body. On the server
+                <code>express.json()</code> can parse the JSON and make the resulting
+                JavaScript object available through <code>req.body</code>.
+            </p>
+
+            <pre><code>
+            JavaScript object
+                    ↓
+            JSON.stringify()
+                    ↓
+            JSON in request body
+                    ↓
+            express.json()
+                    ↓
+            req.body
+        </code></pre>
+        </section>
+    </section>
+
+    <section>
+        <h2 id="semantic-html">Semantic HTML</h2>
+
+        <p>
+            Semantic HTML means using HTML elements that describe the purpose of the
+            content they contain. Instead of using a generic <code>div</code> for
+            everything, we can use elements that tell us what different parts of the
+            page are used for.
+        </p>
+
+        <p>
+            Some semantic elements we have used in the course are
+            <code>nav</code>, <code>main</code> and <code>footer</code>.
+        </p>
+
+        <pre><code>
+            &lt;body&gt;
+                &lt;nav&gt;
+                    &lt;a href="/"&gt;Home&lt;/a&gt;
+                &lt;/nav&gt;
+
+                &lt;main&gt;
+                    &lt;h1&gt;My website&lt;/h1&gt;
+                    &lt;p&gt;This is the main content.&lt;/p&gt;
+                &lt;/main&gt;
+
+                &lt;footer&gt;
+                    &lt;p&gt;This is the footer.&lt;/p&gt;
+                &lt;/footer&gt;
+            &lt;/body&gt;
+        </code></pre>
+
+        <p>
+            The <code>nav</code> element contains navigation links.
+            The <code>main</code> element contains the main unique content of the page.
+            The <code>footer</code> element contains information at the bottom
+            of the page.
+        </p>
+
+        <p>
+            We can also use <code>section</code> to group related content.
+            A section will normally have a heading that describes what it contains.
+        </p>
+
+        <pre><code>
+            &lt;main&gt;
+                &lt;section&gt;
+                    &lt;h2&gt;About the project&lt;/h2&gt;
+                    &lt;p&gt;Information about the project.&lt;/p&gt;
+                &lt;/section&gt;
+
+                &lt;section&gt;
+                    &lt;h2&gt;Contact&lt;/h2&gt;
+                    &lt;p&gt;Contact information.&lt;/p&gt;
+                &lt;/section&gt;
+            &lt;/main&gt;
+        </code></pre>
+
+        <p>
+            Semantic HTML makes the structure of a page easier to understand.
+            It also helps browsers, screen readers and other tools understand
+            the purpose of different parts of the content.
+        </p>
+
+    </section>
+
+    <section>
+        <h2 id="css-layout">CSS layout</h2>
+
+        <p>
+            CSS controls how HTML elements are displayed and positioned on a page.
+            In the course we looked a bit at different ways of arranging elements,
+            including block layout, Flexbox and Grid.
+        </p>
+
+        <section>
+            <h3>Block layout</h3>
+
+            <p>
+                Block elements normally start on a new line and take up the
+                available width of their container.
+            </p>
+
+            <p>
+                Elements such as <code>div</code>, <code>section</code> and
+                <code>p</code> are block elements by default.
+            </p>
+
+            <pre><code>
+            .container {
+                display: block;
+            }
+        </code></pre>
+
+            <p>
+                With block layout, elements are normally placed below each other.
+                This is useful for typical page content such as paragraphs and sections.
+            </p>
+        </section>
+
+        <section>
+            <h3>Flexbox</h3>
+
+            <p>
+                Flexbox is used to arrange elements in one direction, either
+                horizontally or vertically.
+            </p>
+
+            <pre><code>
+            .container {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+            }
+        </code></pre>
+
+            <p>
+                <code>display: flex</code> makes the container a flex container.
+                Its direct children become flex items.
+            </p>
+
+            <p>
+                <code>flex-direction: row</code> arranges the items horizontally.
+                Using <code>column</code> instead arranges them vertically.
+                The <code>gap</code> property adds space between the items.
+            </p>
+
+            <pre><code>
+            .container {
+                display: flex;
+                flex-direction: column;
+            }
+        </code></pre>
+
+            <p>
+                Flexbox is useful when we want to control how elements share
+                space or align inside a container.
+            </p>
+        </section>
+
+        <section>
+            <h3>Grid</h3>
+
+            <p>
+                CSS Grid is used to arrange elements in rows and columns.
+                This makes it useful when we want to control a layout in
+                two directions.
+            </p>
+
+            <pre><code>
+            .container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+        </code></pre>
+
+            <p>
+                <code>display: grid</code> makes the container a grid container.
+                <code>grid-template-columns</code> defines the columns.
+                In this example, <code>1fr 1fr</code> creates two columns
+                that share the available space equally.
+            </p>
+        </section>
+
+        <p>
+            Block layout is useful for ordinary document flow.
+            Flexbox is useful for arranging items in one direction,
+            while Grid is useful for layouts with rows and columns.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="css-units">CSS units</h2>
+
+        <p>
+            CSS uses different units to define sizes, spacing and positions.
+            Some units use fixed values, while others depend on the font size,
+            parent element or browser viewport.
+        </p>
+
+        <section>
+            <h3>px, rem and em</h3>
+
+            <p>
+                <code>px</code> is a CSS pixel. It is for when we want to
+                specify a size directly.
+            </p>
+
+            <p>
+                <code>rem</code> is relative to the font size of the root
+                <code>html</code> element. <code>em</code> is relative to the
+                font size of the element itself when used for most properties,
+                such as padding. For <code>font-size</code>, it is relative
+                to the parent's font size.
+            </p>
+
+            <pre><code>
+            .example {
+                border-width: 2px;
+                padding: 1rem;
+                margin-bottom: 2em;
+            }
+        </code></pre>
+
+            <p>
+                If the root font size is 16px, then 1rem is 16px.
+                If an element has a font size of 20px, then 2em
+                for its margin is 40px.
+            </p>
+        </section>
+
+        <section>
+            <h3>Percentages</h3>
+
+            <p>
+                The <code>%</code> unit is relative to another size.
+                For example, a width of 50% is normally half the width
+                of the containing element.
+            </p>
+
+            <pre><code>
+            .box {
+                width: 50%;
+            }
+        </code></pre>
+        </section>
+
+        <section>
+            <h3>vh and vw</h3>
+
+            <p>
+                <code>vh</code> is relative to the viewport height,
+                and <code>vw</code> is relative to the viewport width.
+                The viewport is the visible area of the browser page.
+            </p>
+
+            <p>
+                <code>100vh</code> corresponds to the full viewport height,
+                while <code>50vw</code> corresponds to half the viewport width.
+            </p>
+
+            <pre><code>
+            .container {
+                min-height: 100vh;
+                width: 50vw;
+            }
+        </code></pre>
+
+            <p>
+                Viewport units are useful when we want an element's size
+                to depend on the browser window and not its content.
+            </p>
+        </section>
+    </section>
+
+    <section>
+        <h2 id="footer-positioning">Positioning the footer with Flexbox</h2>
+
+        <p>
+            When a page does not have much content, the footer can end up
+            higher on the page because the content does not fill the
+            browser window.
+        </p>
+
+        <p>
+            In the course we used Flexbox to make the main content take
+            up the remaining space, so the footer stays near the bottom
+            of the page even when there is little content.
+        </p>
+
+        <pre><code>
+            body {
+                min-height: 95vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            main {
+                flex: 1;
+            }
+        </code></pre>
+
+        <p>
+            <code>min-height: 95vh</code> gives the body a minimum height
+            corresponding to 95% of the viewport height.
+        </p>
+
+        <p>
+            <code>display: flex</code> makes the body a flex container.
+            <code>flex-direction: column</code> arranges its direct
+            children vertically.
+        </p>
+
+        <p>
+            <code>flex: 1</code> allows the main element to grow and
+            take up the available space between the header and footer.
+            This pushes the footer down when the page has little content.
+        </p>
+
+        <section>
+            <h3>Using calculated heights instead</h3>
+
+            <p>
+                Another approach is to calculate the height of the main
+                content based on the space used by the other elements.
+            </p>
+
+            <pre><code>
+            nav {
+                height: 15vh;
+            }
+
+            main {
+                min-height: calc(100vh - 26vh);
+            }
+
+            footer {
+                height: 5vh;
+            }
+        </code></pre>
+
+            <p>
+                This approach depends on the heights of the other elements.
+                If their sizes change, we might also need to update the
+                calculation.
+            </p>
+
+            <p>
+                Flexbox is effective for this layout because the
+                main element can take up the remaining space without
+                manually calculating its height.
+            </p>
+        </section>
+    </section>
+
+    <section>
+        <h2 id="browser-javascript">JavaScript in the browser</h2>
+
+        <p>
+            JavaScript can be used to change the content of an HTML page
+            after it has been loaded in the browser.
+        </p>
+
+        <section>
+            <h3>Updating the footer year</h3>
+
+            <p>
+                In the course we used JavaScript to display the current
+                year in the footer instead of writing a fixed year in HTML.
+            </p>
+
+            <p>
+                First, we can give an HTML element an <code>id</code>
+                so JavaScript can find it.
+            </p>
+
+            <pre><code>
+            &lt;footer&gt;
+                &lt;p id="footer-copyright"&gt;&lt;/p&gt;
+            &lt;/footer&gt;
+        </code></pre>
+
+            <p>
+                We can then use <code>document.getElementById()</code>
+                to find the element and <code>textContent</code> to
+                change its text.
+            </p>
+
+            <pre><code>
+            const currentYear = new Date().getFullYear();
+
+            document.getElementById('footer-copyright').textContent =
+                `Copyright © ${currentYear}`;
+        </code></pre>
+
+            <p>
+                <code>new Date()</code> creates a Date object, and
+                <code>getFullYear()</code> returns the current year.
+                The template literal inserts that year into the text.
+            </p>
+
+            <p>
+                This way, the footer year updates automatically without
+                having to change the HTML every year.
+            </p>
+        </section>
+
+        <section>
+            <h3>Script placement and defer</h3>
+
+            <p>
+                JavaScript that works with HTML elements must run after
+                those elements are available in the document.
+            </p>
+
+            <p>
+                One approach is to place the script at the end of the
+                body, after the HTML elements it needs to access.
+            </p>
+
+            <pre><code>
+            &lt;body&gt;
+                &lt;main&gt;
+                    &lt;h1&gt;My website&lt;/h1&gt;
+                &lt;/main&gt;
+
+                &lt;footer&gt;
+                    &lt;p id="footer-copyright"&gt;&lt;/p&gt;
+                &lt;/footer&gt;
+
+                &lt;script src="/scripts/footer.js"&gt;&lt;/script&gt;
+            &lt;/body&gt;
+        </code></pre>
+
+            <p>
+                We can also load an external JavaScript file using
+                <code>defer</code> in the head.
+            </p>
+
+            <pre><code>
+            &lt;head&gt;
+                &lt;script src="/scripts/footer.js" defer&gt;&lt;/script&gt;
+            &lt;/head&gt;
+        </code></pre>
+
+            <p>
+                With <code>defer</code>, the browser can download the
+                script while parsing the HTML, but waits until the
+                document has been parsed before executing it.
+            </p>
+
+            <p>
+                This means the JavaScript can access the footer element
+                even though the script tag is placed in the head.
+            </p>
+        </section>
+    </section>
+
+    <section>
+        <h2 id="server-side-rendering">Server-Side Rendering (SSR)</h2>
+
+        <p>
+            Server-side rendering means that HTML is constructed on the server
+            and sent to the browser as a complete page.
+        </p>
+
+        <p>
+            For this documentation site, Node.js reads reusable HTML components and combines
+            them with documentation content using a custom templating engine.
+            The completed pages are constructed when the server starts.
+        </p>
+
+        <p>
+            Express then sends the preconstructed HTML when a user visits a route.
+        </p>
+
+        <pre><code class="language-javascript">app.get("/frontend", (req, res) => {
+    res.send(frontendHtml);
+});</code></pre>
+
+        <p>
+            This separates page construction from HTTP request handling.
+            It also avoids rebuilding the same HTML for every request.
+        </p>
+
+        <h3>Reading and Reusing HTML Components</h3>
+
+        <p>
+            A templating engine can reuse HTML from separate files.
+            In this project, Node.js reads the HTML components using
+            fs.readFileSync().
+        </p>
+
+        <pre><code class="language-javascript">export function readComponent(componentName) {
+    const filePath = path.join("public", "components", `${componentName}.html`);
+    return fs.readFileSync(filePath, "utf8");
+}</code></pre>
+
+        <p>
+            path.join() creates the file path, and fs.readFileSync()
+            reads the file as a string. The templating engine can then
+            use replace() to insert the component into the layout.
+        </p>
+
+        <pre><code class="language-javascript">const header = readComponent("header");
+layout = layout.replace("{{header}}", header);</code></pre>
+
+        <h3>Templating Engine Structure</h3>
+
+        <p>
+            The templating engine is split into different JavaScript files.
+            Each file has its own responsibility, so the code is easier to
+            read and to change.
+        </p>
+
+        <pre><code class="language-text">templatingEngine/
+    pages.js
+    navigation.js
+    templatingEngine.js
+    renderedPages.js
+
+public/
+    components/
+        head.html
+        header.html
+        sidebar.html
+        footer.html
+        layout.html</code></pre>
+
+        <p>
+            pages.js contains information about the documentation pages,
+            including their routes and file paths.
+        </p>
+
+        <p>
+            navigation.js reads the documentation headings from the html and creates
+            the links for the sidebar.
+        </p>
+
+        <p>
+            templatingEngine.js reads the HTML components and combines
+            them with the documentation content.
+        </p>
+
+        <p>
+            renderedPages.js constructs all the documentation pages
+            when the server starts. The completed HTML is then imported
+            into app.js and sent through the Express routes.
+        </p>
+
+        <h3>Generating the Sidebar Navigation</h3>
+
+        <p>
+            The sidebar navigation is generated automatically from the
+            documentation pages. This is handled in navigation.js.
+        </p>
+
+        <p>
+            The <code>readHeadings()</code> function reads the HTML file and finds the
+            article content. It then looks for <code>h2</code> headings and extracts
+            their text and <code>id</code> attributes.
+        </p>
+
+        <p>
+            The headings are stored in an array of objects containing
+            an id and text. This information is used by createSectionLinks()
+            to create the links for each heading.
+        </p>
+
+        <p>
+            The createSubjectGroups() function goes through the pages
+            defined in pages.js. It creates an expandable details element
+            for each subject and adds its section links.
+        </p>
+
+        <p>
+            For links on the current page, only the heading id is used.
+            For links to another page, the route is included in the URL.
+            This makes it possible to navigation between subjects(pages) and sections.
+        </p>
+
+        <p>
+            The generated navigation is inserted into sidebar.html
+            by the templating engine.
+        </p>
+
+    </section>
+
+</article>

@@ -1,0 +1,296 @@
+<article class="documentation-content">
+    <section>
+        <h1>Security</h1>
+
+        <p>
+            Data received from a user should not automatically be considered safe.
+            This matters both when the server receives data and when the frontend later
+            displays data in the browser.
+        </p>
+
+        <p>
+            Two of the security considerations we have looked at in the course is
+            Cross-Site Scripting (XXS) and Cross-Origin Resource Sharing (CORS)
+        </p>
+
+    </section>
+
+
+    <section>
+        <h2 id="cors">Cross-Origin Resource Sharing (CORS)</h2>
+
+        <p>
+            CORS stands for Cross-Origin Resource Sharing.
+        </p>
+
+        <p>
+            Browsers have security rules that restrict how JavaScript
+            on one website can access data from another origin.
+        </p>
+
+        <p>
+            An origin is defined by the protocol, hostname and port.
+            For example, <code>http://localhost:8080</code> and
+            <code>http://localhost:3000</code> are different origins
+            because they use different ports.
+        </p>
+
+        <h3>CORS and external APIs</h3>
+
+        <p>
+            When JavaScript in the browser uses <code>fetch()</code>
+            to request data from an external API, the browser might
+            block access to the response because of CORS.
+        </p>
+
+        <p>
+            The external API must allow the origin of our website
+            to read the response.
+        </p>
+
+        <p>
+            This can be a problem when we want to use an API that
+            does not allow requests from our frontend.
+        </p>
+
+        <h3>Calling an API from the server</h3>
+
+        <p>
+            We can avoid this browser CORS problem by making the
+            external API request from our Node.js server instead.
+        </p>
+
+        <p>
+            The browser sends a request to our own Express server.
+            Express then requests the data from the external API
+            and sends the result back to the browser.
+        </p>
+
+        <p>
+            Node.js is not restricted by the browser's CORS rules
+            when making server-side requests.
+        </p>
+
+        <p>
+            This works because the browser only needs to communicate
+            with our own server, using the same origin.
+        </p>
+
+        <h3>CORS is a browser restriction</h3>
+
+        <p>
+            CORS is enforced by the browser.
+        </p>
+
+        <p>
+            A request from frontend JavaScript and a request from
+            Node.js do not have the same CORS restrictions.
+        </p>
+
+        <p>
+            This is one reason we might choose to fetch external
+            data on the server instead of directly from the frontend.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="xss">Cross-Site Scripting - XSS</h2>
+
+        <p>
+            Cross-Site Scripting is when attacker-controlled content causes code to be
+            executed in another user's browser when using a website.
+        </p>
+
+        <p>
+            An example of problematic user input could be:
+        </p>
+
+        <pre><code>
+            &lt;img src="invalid" onerror="alert('XSS')"&gt;
+        </code></pre>
+
+        <p>
+            The value by itself is just data. Storing the
+            string in a database or having it in the Node.js application does not make
+            the JavaScript execute. The dangerous situation happens if a browser later
+            interprets the data as HTML.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="textcontent-innerhtml">textContent and innerHTML</h2>
+
+        <p>
+            How we place user input data into the page makes a difference.
+        </p>
+
+        <p>
+            If the data should be displayed as text, we can use
+            <code>textContent</code>.
+        </p>
+
+        <pre><code>
+            description.textContent = data.description;
+        </code></pre>
+
+        <p>
+            If <code>data.description</code> contains:
+        </p>
+
+        <pre><code>
+            &lt;img src="invalid" onerror="alert('XSS')"&gt;
+        </code></pre>
+
+        <p>
+            the browser displays those characters as text. It does not create an
+            <code>&lt;img&gt;</code> element, so the <code>onerror</code> handler is
+            not executed.
+        </p>
+
+        <p>
+            Using <code>innerHTML</code> is different:
+        </p>
+
+        <pre><code>
+            description.innerHTML = data.description;
+        </code></pre>
+
+        <p>
+            <code>innerHTML</code> tells the browser to interpret the string as HTML.
+            In this example the browser creates an image element. The source
+            <code>"invalid"</code> cannot be loaded, so the
+            <code>onerror</code> code can execute.
+        </p>
+
+        <p>
+            Rule for the course: avoid <code>innerHTML</code> for user input data
+            when the data should only be displayed as text. Use
+            <code>textContent</code> instead.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="xss-execution">Where XSS code executes</h2>
+
+        <p>
+            The injected frontend code is interpreted and executed by the client's browser.
+        </p>
+
+        <p>
+            For example, receiving and storing this string does not make the Node.js
+            process execute the JavaScript inside it:
+        </p>
+
+        <pre><code>
+            &lt;img src="invalid" onerror="alert('XSS')"&gt;
+        </code></pre>
+
+        <p>
+            It becomes dangerous when the value reaches the browser and it treats
+            it as HTML and executes the code.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="validation-sanitization">Validation and sanitization</h2>
+
+        <p>
+            Validation and sanitization are different. Validating input means
+            checking whether the input follows the rules for the data.
+        </p>
+
+        <p>
+            For example, we could require an animal name to be a string between 1 and
+            50 characters.
+        </p>
+
+        <pre><code>
+            name must be a string
+            name must contain between 1 and 50 characters
+        </code></pre>
+
+        <p>
+            Sanitization is removing dangerous content in data that is validated.
+        </p>
+
+        <p>
+            Input can pass validation and still contain dangerous content.
+            Checking that a text has an allowed length does not make
+            everything inside the text safe.
+        </p>
+    </section>
+
+    <section>
+        <h3>A simple sanitization example</h3>
+
+        <p>
+            In class we also made a simple sanitization function by replacing characters
+            that have a special meaning in HTML with their HTML entities.
+        </p>
+
+        <pre><code>
+        function sanitizeXSS(string) {
+            return string
+                .replaceAll('&', '&amp;amp;')
+                .replaceAll('&lt;', '&amp;lt;')
+                .replaceAll('&gt;', '&amp;gt;')
+                .replaceAll('"', '&amp;quot;')
+                .replaceAll("'", '&amp;#39;')
+                .replaceAll('`', '&amp;#x60;')
+                .replaceAll('/', '&amp;#x2F;');
+        }
+    </code></pre>
+
+        <p>
+            For example, the function can be used before putting a string into
+            <code>innerHTML</code>.
+        </p>
+
+        <pre><code>
+        divContainer.innerHTML = sanitizeXSS(
+            `&lt;img src="x" onerror="alert('XSS')"&gt;`
+        );
+    </code></pre>
+
+        <p>
+            The function first replaces <code>&amp;</code> and then replaces characters
+            such as <code>&lt;</code>, <code>&gt;</code> and quotes with their HTML
+            entity representations. The browser will then not interpret the
+            string as the original HTML element.
+        </p>
+
+        <p>
+            When the
+            content is only supposed to be text, using <code>textContent</code> is still
+            simpler because we do not need to interpret the value as HTML at all.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="frontend-backend-protection">Protection in the frontend and backend</h2>
+
+        <p>
+            The course looks at protection on both sides. In the frontend we should avoid
+            putting user-controlled data into <code>innerHTML</code> when it should be
+            text. On the backend we should sanitize data that can contain dangerous
+            content.
+        </p>
+
+        <p>
+            It is useful to protect both sides even if our own frontend currently uses
+            <code>textContent</code> correctly.
+        </p>
+
+        <p>
+            A REST API can have more than one client. We cannot know that every project
+            using data from the API will always display it safely. Another client could
+            take a string returned by the API and put it directly into
+            <code>innerHTML</code>.
+        </p>
+
+        <p>
+            This is one reason not to think of the frontend as the only place where
+            dangerous data is a problem.
+        </p>
+    </section>
+</article>

@@ -24,3 +24,118 @@ header nav ul {
     grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
     gap: 2rem;
 }
+
+/* sidebar */
+
+body:has(.documentation-sidebar) main {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    column-gap: 2rem;
+    align-items: start;
+}
+
+body:has(.documentation-sidebar) main > .mobile-navigation {
+    grid-column: 1;
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+}
+
+.documentation-sidebar {
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+}
+
+body:has(.documentation-sidebar) main > .documentation-content {
+    grid-column: 2;
+    min-width: 0;
+}
+
+.documentation-sidebar nav ul {
+    display: block;
+    padding-left: 1rem;
+}
+
+.documentation-sidebar nav li {
+    display: list-item;
+    margin-bottom: 0.5rem;
+}
+
+.documentation-sidebar nav a {
+    white-space: normal;
+}
+
+/* for mobile and small screens */
+@media (max-width: 768px) {
+    body:has(.documentation-sidebar) main {
+        display: block;
+    }
+
+    body:has(.documentation-sidebar) main > .mobile-navigation {
+        position: static;
+    }
+
+    .documentation-sidebar {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .mobile-navigation {
+        margin-bottom: 2rem;
+    }
+}
+
+/* sticky title header */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--pico-background-color);
+    padding: 1rem;
+    border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.site-header a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* for desktop */
+@media (min-width: 769px) {
+    .mobile-navigation {
+        display: block;
+    }
+
+    .mobile-navigation > summary {
+        display: none;
+    }
+
+    .mobile-navigation::details-content {
+        content-visibility: visible;
+        height: auto;
+    }
+}
+
+/* Keep headings visible below the sticky header */
+
+.documentation-content h2,
+.documentation-content h3,
+.documentation-content h4 {
+    scroll-margin-top: 5rem;
+}
+
+/* footer */
+.site-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+    border-top: 1px solid var(--pico-muted-border-color);
+}
+
+.site-footer a {
+    text-decoration: none;
+}

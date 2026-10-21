@@ -1,37 +1,810 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Node.js & Tools</title>
-    <link rel="stylesheet" href="/pico/pico.min.css">
-    <link rel="stylesheet" href="/styles/main.css">
-</head>
-
-<body>
-    <header>
-        <p>Node.js Course Documentation</p>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/javascript">JavaScript</a></li>
-                <li><a href="/nodejs">Node.js & Tools</a></li>
-                <li><a href="/express">Express & HTTP</a></li>
-                <li><a href="/rest-api">REST APIs</a></li>
-                <li><a href="/frontend-security">Frontend & Security</a></li>
-                <li><a href="/modules-deployment">Modules, Static Files & Deployment</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
+<article class="documentation-content">
+    <section>
         <h1>Node.js & Tools</h1>
-    </main>
 
-    <footer>
-        <p>This is the footer</p>
-    </footer>
-</body>
+        <p>
+            Node.js is a JavaScript runtime that makes it possible to run JavaScript
+            outside of the browser. In this course we use Node.js to run JavaScript
+            on the server.
+        </p>
 
-</html>
+        <p>
+            A JavaScript file can be run with Node.js from the terminal by writing
+            <code>node</code> followed by the name of the file.
+        </p>
+
+        <pre><code>
+            node app.js
+        </code></pre>
+    </section>
+
+
+    <section>
+        <h2 id="file-operations">Synchronous and asynchronous file operations</h2>
+
+        <p>
+            Node.js can read and write files using the built-in
+            <code>fs</code> (file system) module.
+        </p>
+
+        <p>
+            File operations can be synchronous or asynchronous. The important
+            difference is whether JavaScript must wait for the operation
+            to finish before continuing.
+        </p>
+
+        <h3>Synchronous file operations</h3>
+
+        <p>
+            A synchronous operation blocks the single JavaScript thread until
+            the operation is finished.
+        </p>
+
+        <p>
+            For example, <code>readFileSync()</code> reads a file and returns
+            its contents. JavaScript cannot continue to the next statement
+            until the file has been completely read.
+        </p>
+
+        <pre><code class="language-javascript">import fs from "fs";
+
+const content = fs.readFileSync("./page.html", "utf8");
+
+console.log(content);</code></pre>
+
+        <p>
+            This code is easy to read because the result is available
+            immediately after the function returns.
+        </p>
+
+        <p>
+            However, if reading the file takes time, the single JavaScript
+            thread is blocked.
+        </p>
+
+        <p>
+            In an Express application, this can be a problem because
+            the server will have to handle requests from many users.
+        </p>
+
+        <h3>Asynchronous file operations</h3>
+
+        <p>
+            An asynchronous file operation allows JavaScript to continue
+            while the file operation is being handled.
+        </p>
+
+        <p>
+            For example, we can use <code>.readFile()</code> together
+            with <code>await</code>:
+        </p>
+
+        <pre><code class="language-javascript">import fs from "fs";
+
+const content = await fs.readFile("./page.html", "utf8");
+
+console.log(content);</code></pre>
+
+        <p>
+            The <code>await</code> keyword pauses the current async function
+            until the returned promise is resolved, but it does
+            not block the Node.js event loop like an synchronous file operation does.
+        </p>
+
+        <p>
+            This allows Node.js and JavaScript to work on other tasks while waiting
+            for the file operation to finish.
+        </p>
+
+        <h3>Choosing between asynchronous and synchronous</h3>
+
+        <p>
+            Imagine that our Express server needs to read an HTML file
+            whenever a user requests a page.
+        </p>
+
+        <p>
+            If we use <code>readFileSync()</code> inside the route, the
+            JavaScript thread is blocked until the file has been read.
+            Other requests will have to wait.
+        </p>
+
+        <p>
+            If we use an asynchronous file operation, Node.js can handle
+            other requests and code while the file is being read.
+        </p>
+
+        <p>
+            That makes asynchronous a preference for file access
+            when handling requests.
+        </p>
+
+        <h3>When synchronous operations are useful</h3>
+
+        <p>
+            Synchronous operations can be a good choice.
+        </p>
+
+        <p>
+            For example, an application might read its HTML templates
+            once when the server starts and reuse the results for
+            later requests.
+        </p>
+
+        <p>
+            In that situation, using <code>readFileSync()</code> makes
+            the startup code simple, and the file-reading operation
+            does not need to happen for every request.
+        </p>
+
+        <p>
+            The choice depends on <strong>when the file is read and
+                if blocking prevents the server from handling other urgent
+                work</strong>.
+        </p>
+
+        <h3>Speed</h3>
+
+        <p>
+            Asynchronous file operations do not necessarily make an
+            individual file read faster.
+        </p>
+
+        <p>
+            The purpose is to make Node.js able to use the waiting
+            time to handle other work instead of blocking the
+            JavaScript thread.
+        </p>
+
+        <p>
+            This can make a server better at handling many requests in a
+            more balanced way.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="npm-packages">NPM and packages</h2>
+
+        <p>
+            NPM is the package manager we use with Node.js. It can be used to install
+            packages that we want to use as dependencies in a project. Express is an
+            example of a package that we use in the course.
+        </p>
+
+        <p>
+            Other languages and environments have similar tools. In class NPM was for
+            example compared with Maven. They solve some of the same problems even though
+            the files and commands used by the tools are different. For example, Mavens
+            lifecycle sequence is different from the selective call to scripts in Node.js.
+        </p>
+
+        <section>
+            <h3>package.json</h3>
+
+            <p>
+                <code>package.json</code> contains information about a Node.js project.
+                One important purpose is to declare which packages the project depends on.
+            </p>
+
+            <pre><code>
+                {
+                    "dependencies": {
+                        "express": "5.2.1"
+                    }
+                }
+            </code></pre>
+
+            <p>
+                In this example Express is a dependency of the project. The dependency
+                declaration makes it possible to know which package and version the
+                project expects without having to include the installed package itself
+                in the repository.
+            </p>
+
+            <p>
+                <code>package.json</code> can also contain metadata about the project and
+                scripts that can be run with NPM.
+            </p>
+        </section>
+
+        <section>
+            <h3>NPM scripts</h3>
+
+            <p>
+                We can define scripts in <code>package.json</code> to make it easier
+                to run commands for a Node.js project. Instead of writing the full
+                command in the terminal every time, we can give it a name.
+            </p>
+
+            <p>
+                In the course we used different scripts for starting the server
+                normally and for starting it during development.
+            </p>
+
+            <pre><code>
+                {
+                    "scripts": {
+                        "start": "node app.js",
+                        "start-dev": "nodemon app.js"
+                    }
+                }
+            </code></pre>
+
+            <p>
+                The scripts are defined inside the <code>scripts</code> object
+                in <code>package.json</code>. The property name is the name
+                of the script, and the value is the terminal command that NPM runs.
+            </p>
+
+            <p>
+                We can run the scripts from the terminal:
+            </p>
+
+            <pre><code>
+            npm start
+            npm run start-dev
+        </code></pre>
+
+            <p>
+                <code>npm start</code> runs the <code>start</code> script.
+                For a custom script such as <code>start-dev</code>, we use
+                <code>npm run</code> followed by the script name.
+            </p>
+
+            <p>
+                The first script starts the application with Node.js.
+                The second starts it with Nodemon, which restarts the
+                server when we change the source code.
+            </p>
+
+            <p>
+                Scripts make it easier to run the project because we can
+                use the same commands without having to remember the
+                full command behind each script.
+            </p>
+        </section>
+
+        <section>
+            <h3>Environment variables and cross-env</h3>
+
+            <p>
+                Environment variables are values that a program can read from
+                the environment where it is running. In Node.js we can access
+                them through <code>process.env</code>.
+            </p>
+
+            <p>
+                In the course we used an environment variable to decide which
+                port the Express server should listen on.
+            </p>
+
+            <pre><code>
+            const PORT = process.env.PORT ?? 8080;
+
+            app.listen(PORT);
+        </code></pre>
+
+            <p>
+                <code>process.env.PORT</code> reads the environment variable
+                named <code>PORT</code>. The <code>??</code> operator gives
+                a fallback value when the variable is
+                <code>null</code> or <code>undefined</code>.
+            </p>
+
+            <p>
+                This means the server uses port 8080 when no
+                <code>PORT</code> environment variable has been provided.
+                If we provide a different port, the same application can
+                listen on that port without changing the source code.
+            </p>
+
+            <section>
+                <h4>Setting an environment variable</h4>
+
+                <p>
+                    In the terminal we can set an environment variable
+                    for a single command:
+                </p>
+
+                <pre><code>
+            PORT=9090 node app.js
+        </code></pre>
+
+                <p>
+                    This starts the application with
+                    <code>process.env.PORT</code> set to
+                    <code>9090</code> for that command.
+                </p>
+
+                <p>
+                    The syntax for setting environment variables is not
+                    the same in every terminal or operating system. It is impractical
+                    to use different commannds or make different scripts for
+                    different operating systems.
+                    We can use <code>cross-env</code> to solve that problem with scripts.
+                </p>
+            </section>
+
+            <section>
+                <h4>Using cross-env in NPM scripts</h4>
+
+                <p>
+                    <code>cross-env</code> is a package that lets us set
+                    environment variables when running commands through
+                    NPM scripts without depending on the operating system.
+                </p>
+
+                <p>
+                    In class we have used scripts like these:
+                </p>
+
+                <pre><code>
+                {
+                    "scripts": {
+                        "start": "cross-env PORT=80 node app.js",
+                        "start-dev": "cross-env PORT=9090 nodemon app.js"
+                    }
+                }
+            </code></pre>
+
+                <p>
+                    The <code>start</code> script starts the server with
+                    Node.js on port 80. The <code>start-dev</code> script
+                    starts it with Nodemon on port 9090.
+                </p>
+
+                <p>
+                    We can run them with:
+                </p>
+
+                <pre><code>
+            npm start
+            npm run start-dev
+        </code></pre>
+
+                <p>
+                    When we run one of these scripts,
+                    <code>cross-env</code> sets the
+                    <code>PORT</code> environment variable before
+                    starting the Node.js process.
+                </p>
+
+                <p>
+                    The application then reads the value through
+                    <code>process.env.PORT</code>.
+                </p>
+            </section>
+
+            <section>
+                <h4>Nullish coalescing and logical OR</h4>
+
+                <p>
+                    We can use both <code>??</code> and
+                    <code>||</code> to provide fallback values,
+                    but they do not work the same way.
+                </p>
+
+                <pre><code>
+            const port1 = process.env.PORT ?? 8080;
+            const port2 = process.env.PORT || 8080;
+        </code></pre>
+
+                <p>
+                    <code>??</code> uses the fallback only when the
+                    value is <code>null</code> or
+                    <code>undefined</code>.
+                </p>
+
+                <p>
+                    <code>||</code> uses the fallback when the
+                    value is falsy, for example
+                    <code>0</code>, <code>false</code>
+                    or an empty string.
+                </p>
+
+                <p>
+                    Environment variables are read as strings,
+                    so the value <code>"0"</code> is not the
+                    same as the number <code>0</code>.
+                </p>
+            </section>
+        </section>
+
+        <section>
+            <h3>Dependencies and devDependencies</h3>
+
+            <p>
+                Packages in a Node.js project can be declared as
+                dependencies or devDependencies in package.json.
+            </p>
+
+            <p>
+                Dependencies are packages that the application needs
+                when it runs. Express is an example because our server
+                uses Express to handle HTTP requests.
+            </p>
+
+            <p>
+                devDependencies are packages that we use during
+                development, but that are not needed to run
+                the application in production.
+            </p>
+
+            <p>
+                Nodemon is an example of a development tool because
+                it restarts the server when we change the code.
+            </p>
+
+            <pre><code>
+            {
+                "dependencies": {
+                    "express": "5.2.1"
+                },
+                "devDependencies": {
+                    "cross-env": "^10.1.0",
+                    "nodemon": "^3.1.10"
+                }
+            }
+        </code></pre>
+
+            <p>
+                This is an example of how the two types of dependencies
+                can be organized in package.json. The exact versions
+                depend on the packages installed in the project.
+            </p>
+
+            <p>
+                We can install a normal dependency with:
+            </p>
+
+            <pre><code>
+            npm install express
+        </code></pre>
+
+            <p>
+                To install a package as a devDependency, we can use
+                the <code>-D</code> flag:
+            </p>
+
+            <pre><code>
+            npm install -D nodemon
+        </code></pre>
+
+            <p>
+                The <code>-D</code> flag is short for
+                <code>--save-dev</code>. NPM then adds the package
+                to the devDependencies section of package.json.
+            </p>
+
+            <p>
+                A package installed as a devDependency can still be used in any script.
+            </p>
+        </section>
+
+        <section>
+            <h3>Working with NPM from the terminal</h3>
+
+            <p>
+                There are different ways of setting up a Node.js project with NPM. We have
+                practiced both creating <code>package.json</code> ourselves and letting NPM
+                create it.
+            </p>
+
+            <p>
+                If <code>package.json</code> has already been created and contains the
+                dependencies for the project, we can install those dependencies with:
+            </p>
+
+            <pre><code>
+        npm install
+    </code></pre>
+
+            <p>
+                NPM reads package.json and installs the dependencies into
+                <code>node_modules</code>. This is also why we do not need to get
+                <code>node_modules</code> from Git when cloning an existing project. The
+                dependencies will be installed again with NPM.
+            </p>
+
+            <p>
+                Instead of writing <code>package.json</code> by hand, NPM can initialize a
+                project for us.
+            </p>
+
+            <pre><code>
+        npm init
+    </code></pre>
+
+            <p>
+                This starts an interactive setup where NPM asks for information about the
+                project before creating <code>package.json</code>.
+            </p>
+
+            <p>
+                The setup can also be made without going through the questions:
+            </p>
+
+            <pre><code>
+        npm init -y
+    </code></pre>
+
+            <p>
+                The <code>-y</code> flag accepts the default values, so
+                <code>package.json</code> is created immediately. The file can still be
+                changed afterwards.
+            </p>
+
+            <section>
+                <h4>Installing a package</h4>
+
+                <p>
+                    We can install a specific package by giving its name to
+                    <code>npm install</code>. To install Express we can write:
+                </p>
+
+                <pre><code>
+            npm install express
+        </code></pre>
+
+                <p>
+                    This installs Express into <code>node_modules</code> and adds Express
+                    as a dependency of the project in <code>package.json</code>
+                </p>
+
+                <p>
+                    That is the difference between the two commands:
+                    <code>npm install</code> installs the dependencies already declared by
+                    the project, while <code>npm install express</code> asks NPM to add and
+                    install Express as a dependency.
+                </p>
+            </section>
+
+            <section>
+                <h4>Inspecting installed packages</h4>
+
+                <p>
+                    NPM also has commands for checking which packages
+                    are installed in a project.
+                </p>
+
+                <p>
+                    We can use <code>npm ls</code> to list the installed
+                    packages and their dependencies.
+                </p>
+
+                <pre><code>
+            npm ls
+        </code></pre>
+
+                <p>
+                    The output shows the dependency tree for the project.
+                    Packages can have their own dependencies, so the tree
+                    may contain more packages than the ones we installed
+                    directly.
+                </p>
+
+                <p>
+                    We can use the flag <code>--depth=0</code> when we only want
+                    to see the top-level packages.
+                </p>
+
+                <pre><code>
+            npm ls --depth=0
+        </code></pre>
+
+                <p>
+                    If we want to check a specific package, we can
+                    provide its name.
+                </p>
+
+                <pre><code>
+            npm ls cross-env
+        </code></pre>
+
+                <p>
+                    This shows if <code>cross-env</code> is present
+                    in the projects dependency tree.
+                </p>
+
+                <p>
+                    We can also inspect packages that have been installed
+                    globally on the computer.
+                </p>
+
+                <pre><code>
+            npm ls -g
+            npm ls -g --depth=0
+        </code></pre>
+
+                <p>
+                    The <code>-g</code> flag means global.
+                    A global installation is not tied to one specific
+                    project's <code>node_modules</code> directory.
+                </p>
+
+                <p>
+                    Declaring the packages needed by the project in
+                    <code>package.json</code> makes it easy for
+                    someone else to install the dependencies and run
+                    the project.
+                </p>
+            </section>
+
+        </section>
+
+        <section>
+            <h3>node_modules</h3>
+
+            <p>
+                When packages are installed they are placed in the
+                <code>node_modules</code> directory. This directory can contain a very
+                large amount of files because the packages we install can have their own
+                dependencies.
+            </p>
+
+            <p>
+                Rule for the course: do not push <code>node_modules</code> to the
+                repository. The dependencies are declared by the project and can be
+                installed again instead of storing all the installed package files in Git.
+            </p>
+        </section>
+
+    </section>
+
+    <section>
+        <h2 id="nodemon">Nodemon</h2>
+
+        <p>
+            When running a Node.js server normally, changes to the source code will not
+            automatically restart the running server. During development that would mean
+            manually stopping and starting the server every time we make a change.
+        </p>
+
+        <p>
+            Nodemon is a development tool that watches the project files and restarts
+            the Node.js process when the code changes. This makes development practical
+            because the changed server code is automatically loaded.
+        </p>
+
+        <p>
+            Nodemon is a development tool. In production we do not want
+            changes to source files to unexpectedly restart the application.
+        </p>
+
+        <section>
+            <h3>Running Nodemon</h3>
+
+            <p>
+                We can install Nodemon as a development dependency
+                using NPM.
+            </p>
+
+            <pre><code>
+            npm install -D nodemon
+        </code></pre>
+
+            <p>
+                After installing Nodemon locally, we can run it
+                through an NPM script in package.json.
+            </p>
+
+            <pre><code>
+            {
+                "scripts": {
+                    "start-dev": "nodemon app.js"
+                }
+            }
+        </code></pre>
+
+            <p>
+                We can then start the server with:
+            </p>
+
+            <pre><code>
+            npm run start-dev
+        </code></pre>
+
+            <p>
+                Nodemon starts the application and watches for changes
+                to the source code files. When we save a change, Nodemon
+                restarts the Node.js process automatically.
+            </p>
+
+            <p>
+                This is useful when working with Express because
+                we can change a route, save the file, and test
+                the updated server without manually restarting it.
+            </p>
+
+            <p>
+                If we only change a static HTML or CSS file, we
+                normally just need to refresh the browser.
+                Express can serve the updated files of this type without
+                restarting the server.
+            </p>
+
+            <p>
+                In class we combined Nodemon with
+                cross-env to set the server port:
+            </p>
+
+            <pre><code>
+            {
+                "scripts": {
+                    "start-dev": "cross-env PORT=9090 nodemon app.js"
+                }
+            }
+        </code></pre>
+
+            <p>
+                This script starts the application with Nodemon
+                and sets the PORT environment variable to 9090.
+                The application must read process.env.PORT for
+                that setting to control the listening port.
+            </p>
+        </section>
+
+
+        <section>
+            <h3>Configuring Nodemon</h3>
+
+            <p>
+                Nodemon automatically restarts our Node.js application when
+                files change. We can configure which file types it should watch.
+            </p>
+
+            <p>
+                By default, Nodemon watches code file types such as
+                JavaScript.
+            </p>
+
+            <p>
+                We can create a <code>nodemon.json</code> file in the root
+                of our project to configure which file extensions it watches.
+            </p>
+
+            <p>For example:</p>
+
+            <pre><code class="language-json">{
+    "ext": "js,mjs,cjs,json,css,html"
+}</code></pre>
+
+            <p>
+                With this configuration, Nodemon also restarts the server
+                when we change for example CSS or HTML files.
+            </p>
+
+            <p>
+                This can be useful when our application reads HTML files
+                and constructs pages when the server starts. Restarting
+                the server allows it to read the updated files.
+            </p>
+
+            <h4>Nodemon and browser refreshing</h4>
+
+            <p>
+                Nodemon restarts the Node.js server, but it does not
+                automatically refresh the browser page.
+            </p>
+
+            <p>
+                If we change a CSS file that Express serves statically,
+                we can normally just refresh the browser to see the change.
+                The server does not need to restart.
+            </p>
+
+            <p>
+                However, if our server reads an HTML file only once
+                during startup and stores the result, it must read
+                the file again before the changes appear. Restarting
+                the server is one way to do that.
+            </p>
+
+            <p>
+                So we should configure Nodemon based on how
+                our application works.
+            </p>
+        </section>
+
+    </section>
+</article>

@@ -1,37 +1,57 @@
 import express from 'express';
 const app = express();
+
+import {
+    homeHtml,
+    frontendHtml,
+    javascriptHtml,
+    nodejsHtml,
+    expressHtml,
+    restApiHtml,
+    securityHtml,
+    modulesHtml
+} from "./templatingEngine/renderedPages.js";
+
 const PORT = 8080;
+
 
 app.use(express.static('public'));
 app.use('/pico', express.static('node_modules/@picocss/pico/css'))
+app.use('/highlight', express.static('node_modules/@highlightjs/cdn-assets'));
 
-app.get('/', (req, res) => {
-    res.sendFile('/frontpage/index.html', { root: 'public' });
+
+app.get("/", (req, res) => {
+    res.send(homeHtml);
 });
 
-app.get('/javascript', (req, res) => {
-    res.sendFile('javascript/javascript.html', { root: 'public' });
+app.get("/javascript", (req, res) => {
+    res.send(javascriptHtml);
 });
 
-app.get('/nodejs', (req, res) => {
-    res.sendFile('nodejs/nodejs.html', { root: 'public' });
+app.get("/nodejs", (req, res) => {
+    res.send(nodejsHtml);
 });
 
-app.get('/express', (req, res) => {
-    res.sendFile('express/express.html', { root: 'public' });
+app.get("/express", (req, res) => {
+    res.send(expressHtml);
 });
 
-app.get('/rest-api', (req, res) => {
-    res.sendFile('rest-api/rest-api.html', { root: 'public' });
+app.get("/rest-api", (req, res) => {
+    res.send(restApiHtml);
 });
 
-app.get('/frontend-security', (req, res) => {
-    res.sendFile('frontend-security/frontend-security.html', { root: 'public' });
+app.get("/frontend", (req, res) => {
+    res.send(frontendHtml);
 });
 
-app.get('/modules-deployment', (req, res) => {
-    res.sendFile('modules-deployment/modules-deployment.html', { root: 'public' });
+app.get("/security", (req, res) => {
+    res.send(securityHtml);
 });
+
+app.get("/modules-deployment", (req, res) => {
+    res.send(modulesHtml);
+});
+
 
 app.listen(PORT, (error) => {
     if(error) {

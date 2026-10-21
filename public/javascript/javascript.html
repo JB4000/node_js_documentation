@@ -1,71 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
+<article class="documentation-content">
+    <h1>JavaScript</h1>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaScript</title>
-    <link rel="stylesheet" href="/pico/pico.min.css">
-    <link rel="stylesheet" href="/styles/main.css">
-</head>
+    <p>
+        This page will contain some useful approaches and guidelines from the course on using
+        JavaScript with Node.JS and in general. The page will present code examples from the
+        course with short explanations to support the guidelines. Subjects covered will
+        be for example variables, scope, data types, type coercion, strings and template literals.
+    </p>
 
-<body>
-    <header>
-        <p>Node.js Course Documentation</p>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/javascript">JavaScript</a></li>
-                <li><a href="/nodejs">Node.js & Tools</a></li>
-                <li><a href="/express">Express & HTTP</a></li>
-                <li><a href="/rest-api">REST APIs</a></li>
-                <li><a href="/frontend-security">Frontend & Security</a></li>
-                <li><a href="/modules-deployment">Modules, Static Files & Deployment</a></li>
-            </ul>
-        </nav>
-    </header>
+    <section>
+        <h2 id="variables">Declaring variables with const, let and var</h2>
 
-    <main>
-        <section>
-            <h1>JavaScript</h1>
+        <p>
+            Rule for the course: use <code>const</code> for declaring variables as default, change to
+            <code>let</code>if reassignment is necessary. Never use <code>var</code>.
+        </p>
 
-            <p>
-                This page will contain some useful approaches to guidelines from the course on using
-                JavaScript with Node.JS and in general. The page will present code examples from the
-                course with short explanations to support the guidelines. Subjects covered will
-                be variables, scope, data types, type coercion, strings and template literals.
-            </p>
+        <p>
+            The reason for this guideline is to prevent unintentional reassignments or mutations.
+            Here are some illustrations of the problems that can arise.
+        </p>
 
-            <section>
-                <h2>Declaring variables with const, let and var</h2>
-
-                <p>
-                    Rule for the course: use <code>const</code> for declaring variables as default, change to
-                    <code>let</code>if reassignment is necessary. Never use <code>var</code>.
-                </p>
-
-                <p>
-                    The reason for this guideline is to prevent unintentional reassignments or mutations.
-                    Here are some illustrations of the problems that can arise.
-                </p>
-
-                <pre><code>
+        <pre><code>
                 const someNumber = 255;
                 
                 let someNumber = 255;
                 </code></pre>
 
-                <p>
-                    When using <code>const</code> in the declaration the variable is constant in assignment, so
-                    the value of someNumber can not change. When using <code>let</code> reassignment is
-                    possible, so the value can change. For example using <code>someNumber++</code>
-                    An example of a case for <code>let</code> would be a counter that has to increment.
-                    If the variable contains a value that is a reference, then that reference can not change.
-                    But the data the refernce points to can change. That means that the properties of
-                    an object can change without reassignment of the variable. Properties can be added too.
-                </p>
+        <p>
+            When using <code>const</code> in the declaration the variable is constant in assignment, so
+            the value of someNumber can not change. When using <code>let</code> reassignment is
+            possible, so the value can change. For example using <code>someNumber++</code>
+            An example of a case for <code>let</code> would be a counter that has to increment.
+            If the variable contains a value that is a reference, then that reference can not change.
+            But the data the refernce points to can change. That means that the properties of
+            an object can change without reassignment of the variable. Properties can be added too.
+        </p>
 
-                <pre><code>
+        <pre><code>
                     const person = {
                         name: "Paul"
                     };
@@ -74,43 +46,43 @@
                     person.age = 32;
                 </code></pre>
 
-                <p>
-                    The above example is an object, but the same is true for arrays.
-                </p>
+        <p>
+            The above example is an object, but the same is true for arrays.
+        </p>
 
-                <pre><code>
+        <pre><code>
                     const roles = ["Teacher"];
 
                     roles.push("Student");
                 </code></pre>
 
-                <p>
-                    In both cases no reassignment have taken place.
-                    <code>const</code> provides more safety with primitive values then reference types, but
-                    but there is still protection against reassignment of the reference.
-                </p>
+        <p>
+            In both cases no reassignment have taken place.
+            <code>const</code> provides more safety with primitive values than reference types, but
+            but there is still protection against reassignment of the reference.
+        </p>
 
-                <pre><code>
+        <pre><code>
                 const roles = ["Teacher"];
 
                 roles = ["Student"];   
                 </code></pre>
 
-                <p>
-                    The example above attempts to reassign the reference to a whole new array. <code>const</code>
-                    prevents that.
-                </p>
+        <p>
+            The example above attempts to reassign the reference to a whole new array. <code>const</code>
+            prevents that.
+        </p>
 
-                <section>
-                    <h3>Scope and <code>var</code></h3>
+        <section>
+            <h3>Scope and <code>var</code></h3>
 
-                    <p>
-                        <code>var</code> allows reassignment on a larger scope than <code>let</code>.
-                        That situation can be even more comple to manage. <code>let</code> has
-                        <code>block scope</code> where <code>var</code> has <code>function scope</code>.
-                    </p>
+            <p>
+                <code>var</code> allows reassignment on a larger scope than <code>let</code>.
+                That situation can be even more complex to manage. <code>let</code> has
+                <code>block scope</code> where <code>var</code> has <code>function scope</code>.
+            </p>
 
-                    <pre><code>
+            <pre><code>
                     {
                         var someValue = 123;
                         {
@@ -128,16 +100,16 @@
                     }
                     </code></pre>
 
-                    <p>
-                        In the last example the variable <code>someOtherValue</code> will hold the value
-                        <code>false</code> in the inner block and the value <code>true</code> in the outer block.
-                        Because of the scope these are two different variables.
-                        The inner variable temporarily <code>shadows</code> the outer variable.
-                        In the first example the inner statement will instead reassign the value 456 to the existing
-                        variable because the <code>function scope</code> goes beyond the block.
-                    </p>
+            <p>
+                In the last example the variable <code>someOtherValue</code> will hold the value
+                <code>false</code> in the inner block and the value <code>true</code> in the outer block.
+                Because of the scope these are two different variables.
+                The inner variable temporarily <code>shadows</code> the outer variable.
+                In the first example the inner statement will instead reassign the value 456 to the existing
+                variable because the <code>function scope</code> goes beyond the block.
+            </p>
 
-                    <pre><code>
+            <pre><code>
                     for (let i = 0; i <= 5; i++) {
                         setTimeout(() => {
                             console.log(i);
@@ -153,114 +125,114 @@
                     // 6,6,6,6,6,6
                     </code></pre>
 
-                    <p>
-                        The above example is an illustration of how code is more predictable using when
-                        using <code>let</code> for reassignment instead of using <code>var</code>.
-                        The first example prints the sequence as predicted because the value send to the
-                        callback function does not change. There will be 6 different callback functions called
-                        and they all have different values for <code>i</code>.
-                        In the last example the <code>i</code> variable in every callback function will be
-                        reassigned evry time the update part of the loop makes an increment of <code>i</code>.
-                        The value will be 6 because of the last increment made before the comparison that results
-                        in the loop not continuing.
-                    </p>
-                </section>
-            </section>
+            <p>
+                The above example is an illustration of how code is more predictable when
+                using <code>let</code> for reassignment instead of using <code>var</code>.
+                The first example prints the sequence as predicted because the value send to the
+                callback function does not change. There will be 6 different callback functions called
+                and they all have different values for <code>i</code>.
+                In the last example the <code>i</code> variable in every callback function will be
+                reassigned evry time the update part of the loop makes an increment of <code>i</code>.
+                The value will be 6 because of the last increment made before the comparison that results
+                in the loop not continuing.
+            </p>
+        </section>
+    </section>
 
-            <section>
-                <h2>Type coercion</h2>
+    <section>
+        <h2 id="type-coercion">Type coercion</h2>
 
-                <p>
-                    JavaScript can automatically coerce values from one type to another. It can be used
-                    in clever ways, but we will avoid on the course to make our code more predictable.
-                </p>
+        <p>
+            JavaScript can automatically coerce values from one type to another. It can be used
+            in clever ways, but we will avoid that on the course to make our code more predictable.
+        </p>
 
-                <p>
-                    Rule for the course: Always use strict equality checks, never use loose equality checks
-                </p>
+        <p>
+            Rule for the course: Always use strict equality checks, never use loose equality checks
+        </p>
 
-                <pre><code>
+        <pre><code>
                     5 == "5"
 
                     5 === "5"
                 </code></pre>
 
-                <p>
-                    In the example a number is being compared to a string. The first
-                    line uses <code>loose equality</code> that coerces the string to a number before making
-                    the comparison. Therefore the expression will be <code>true</code>. The last example
-                    uses <code>strict equality</code> which never coerces one type into another type but
-                    simple considers different types as unequal. Therefore the expression will be
-                    <code>false</code>. The same principle applies to <code>loose inequality</code> and
-                    <code>strict inequality</code>
-                </p>
+        <p>
+            In the example a number is being compared to a string. The first
+            line uses <code>loose equality</code> that coerces the string to a number before making
+            the comparison. Therefore the expression will be <code>true</code>. The last example
+            uses <code>strict equality</code> which never coerces one type into another type but
+            simply considers different types as unequal. Therefore the expression will be
+            <code>false</code>. The same principle applies to <code>loose inequality</code> and
+            <code>strict inequality</code>
+        </p>
 
-                <pre><code>
+        <pre><code>
                     5 != "5"   // false
                     5 !== "5"  // true
                 </code></pre>
 
-                <p>
-                    When we have to compare across types we explicitly use conversion methods instead of
-                    coercion. These methods are named from the type they convert. Here are a few examples.
-                </p>
+        <p>
+            When we have to compare across types we explicitly use conversion methods instead of
+            coercion. These methods are named from the type they convert to. Here are a few examples.
+        </p>
 
-                <pre><code>
+        <pre><code>
                     Number("5");
                     String(5);
                     Boolean("true");
                 </code></pre>
 
-                <p>
-                    String concatenation is another issue where we want to avoid coercion.
-                </p>
+        <p>
+            String concatenation is another issue where we want to avoid coercion.
+        </p>
 
-                <pre><code>
+        <pre><code>
                     console.log("150" + 100); 
                     // 150100
                 </code></pre>
 
-                <p>
-                    In the above example the number 100 is coerced to string causing string concatenation
-                    instead of addition. The result can be made into addition if we explicitly convert the
-                    string to a number.
-                </p>
+        <p>
+            In the above example the number 100 is coerced to string causing string concatenation
+            instead of addition. The result can be made into addition if we explicitly convert the
+            string to a number.
+        </p>
 
-                <pre><code>
+        <pre><code>
                     console.log(Number("150") + 100);
                     // 250
                 </code></pre>
 
-                <p>
-                    String concatenation can also happen with <code>console.log()</code>in cases
-                    where we simply want separate values.
-                </p>
+        <p>
+            String concatenation can also happen with <code>console.log()</code>in cases
+            where we simply want separate values.
+        </p>
 
-                <p>
-                    Rule for the course: Always use comma in <code>console.log()</code> to separate values
-                </p>
+        <p>
+            Rule for the course: Always use comma in <code>console.log()</code> to separate values
+        </p>
 
-                <pre><code>
+        <pre><code>
                     const a = 10;
                     const b = 20;
 
                     console.log("Values:", a, b);     //Values: 10 20
                     console.log("Values: " + a + b);  //Values:1020
                 </code></pre>
-            </section>
+    </section>
 
-            <section>
-                <h2>Data types</h2>
+    <section>
+        <h2 id="data-types">Data types</h2>
 
-                <section>
-                    <h3>Primitive types</h3>
+        <section>
+            <h3>Primitive types</h3>
 
-                    <p>
-                        JavaScript has a range of types where some are primitive types and some are reference types.
-                        Here is a list of primitive types
-                    </p>
+            <p>
+                JavaScript has a range of types where some are primitive types and some are reference types.
+                Here is a list of primitive types
+            </p>
 
-                    <pre><code>
+            <pre><code>
                         const a = "Hello";      //string
                         const b = true;         //boolean
                         const c = 42;           //number
@@ -271,57 +243,57 @@
                         const g = Symbol("id"); //symbol
                     </code></pre>
 
-                    <p>
-                        <code>string</code>
-                        is for text and <code>boolean</code> is for boolean values. <code>number</code> can hold
-                        positive and negative floats. <code>bigint</code> is for holding precise values of
-                        very big integers that goes beyond the range of <code>number</code>. <code>symbol</code> is
-                        not used in this course. It is holding values returned from Symbol() when wanting to use
-                        unique values for id in certain context.
-                        <code>undefined</code> represents the absence of a value. A
-                        function will also return <code>undefined</code> if there is no return statement or if the
-                        return statement is not combined with a value is in <code>return;</code>
-                        <code>null</code> on the other hand is used to show that a variable is intentionally
-                        without a value.
-                    </p>
+            <p>
+                <code>string</code>
+                is for text and <code>boolean</code> is for boolean values. <code>number</code> can hold
+                positive and negative floats. <code>bigint</code> is for holding precise values of
+                very big integers that goes beyond the range of <code>number</code>. <code>symbol</code> is
+                not used in this course. It is holding values returned from Symbol() when wanting to use
+                unique values for id in certain context.
+                <code>undefined</code> represents the absence of a value. A
+                function will also return <code>undefined</code> if there is no return statement or if the
+                return statement is not combined with a value as in <code>return;</code>
+                <code>null</code> on the other hand is used to show that a variable is intentionally
+                without a value.
+            </p>
 
-                    <pre><code>
+            <pre><code>
                         console.log(typeof "Hello"); //string
                     </code></pre>
 
-                    <p>
-                        <code>typeof</code> will return the type of a value og variable. However, using
-                        <code>typeof</code> with <code>null</code> will return object, even though null is a
-                        primitive type.
-                    </p>
-                </section>
+            <p>
+                <code>typeof</code> will return the type of a value or variable. However, using
+                <code>typeof</code> with <code>null</code> will return object, even though null is a
+                primitive type.
+            </p>
+        </section>
 
-                <section>
-                    <h3>Reference types</h3>
+        <section>
+            <h3>Reference types</h3>
 
-                    <pre><code>
+            <pre><code>
                         const g = { name: "Johnny", age: 25 };
                         const h = ["cat", "dog", "bird"];
                     </code></pre>
 
-                    <p>
-                        When using <code>typeof</code> on these two examples th result will be object, because
-                        object and array hold references to data in memory. The properties of the object and
-                        the items in the array can be changed, but the reference can not be changed when
-                        <code>const</code> is used. Objects are <code>mutable</code> even when using <code>const</code>
-                    </p>
+            <p>
+                When using <code>typeof</code> on these two examples th result will be object, because
+                object and array hold references to data in memory. The properties of the object and
+                the items in the array can be changed, but the reference can not be changed when
+                <code>const</code> is used. Objects are <code>mutable</code> even when using <code>const</code>
+            </p>
 
-                </section>
-            </section>
+        </section>
+    </section>
 
-            <section>
-                <h2>Strings and template literals</h2>
+    <section>
+        <h2 id="strings-template-literals">Strings and template literals</h2>
 
-                <p>
-                    There are multiple ways of printing strings that can have different results
-                </p>
+        <p>
+            There are multiple ways of printing strings that can have different results
+        </p>
 
-                <pre><code>
+        <pre><code>
                     const age = 25;
 
                     console.log("John said: 'Hi' to the dog");
@@ -329,19 +301,19 @@
                     console.log(`John is ${age} years old. He uses "Instagram" and 'TikTok'`);
                 </code></pre>
 
-                <p>
-                    Single quotes can be nested inside double quotes, and the other way around. Whatever
-                    quote type starts the string will also end it. Everything before that is considered
-                    part of the string and anything after is not.
-                    It is not possible to use the same type of quotes nested, that will simply cut
-                    the string as soon as the second quote is introduced. Unless you escape it with <code>\'</code>
-                    Template literals using backticks can use variables and expressions inside braces and
-                    new lines. <code>Interpolation</code> refers to the evaluation of the expression before
-                    making it part of th string. Single and double quotes is just considered part of the string.
-                    These are all valid, but messy, statements that will print in their entirity.
-                </p>
+        <p>
+            Single quotes can be nested inside double quotes, and the other way around. Whatever
+            quote type starts the string will also end it. Everything before that is considered
+            part of the string and anything after is not.
+            It is not possible to use the same type of quotes nested, that will simply cut
+            the string as soon as the second quote is introduced. Unless you escape it with <code>\'</code>
+            Template literals using backticks can use variables and expressions inside braces and
+            new lines. <code>Interpolation</code> refers to the evaluation of the expression before
+            making it part of the string. Single and double quotes is just considered part of the string.
+            The following are all valid, but messy, statements that will print in their entirity.
+        </p>
 
-                <pre><code>
+        <pre><code>
                     const greetingOne = 'Hey, """"""""""friend"';
                     const greeting = 'It\'s me, Johnny';
                     const greetingTwo = "Hey, my old '''''friend'";
@@ -352,27 +324,27 @@
                         and this
                         `;
                 </code></pre>
-            </section>
-            <section>
-                <h2>Functions and callbacks</h2>
+    </section>
+    <section>
+        <h2 id="functions-callbacks">Functions and callbacks</h2>
 
-                <p>
-                    Functions can be defined in different ways in JavaScript. A function declaration
-                    defines the function directly with a name.
-                </p>
+        <p>
+            Functions can be defined in different ways in JavaScript. A function declaration
+            defines the function directly with a name.
+        </p>
 
-                <pre><code>
+        <pre><code>
         function playingGuitarAction(name) {
             return `${name} likes to play guitar`;
         }
     </code></pre>
 
-                <p>
-                    Function declarations are hoisted. That means that the function can be called by
-                    code that appears before the function declaration in the file.
-                </p>
+        <p>
+            Function declarations are hoisted. That means that the function can be called by
+            code that appears before the function declaration in the file.
+        </p>
 
-                <pre><code>
+        <pre><code>
         sayHello();
 
         function sayHello() {
@@ -380,48 +352,48 @@
         }
     </code></pre>
 
-                <p>
-                    A function can also be created as a function expression and assigned to a variable.
-                    In this example the function itself is anonymous because it does not have a name
-                    in the function definition.
-                </p>
+        <p>
+            A function can also be created as a function expression and assigned to a variable.
+            In this example the function itself is anonymous because it does not have a name
+            in the function definition.
+        </p>
 
-                <pre><code>
+        <pre><code>
         const playingGuitarAction = function (name) {
             return `${name} likes to play guitar`;
         };
     </code></pre>
 
-                <p>
-                    An arrow function is another syntax for creating a function.
-                </p>
+        <p>
+            An arrow function is another syntax for creating a function.
+        </p>
 
-                <pre><code>
+        <pre><code>
         const watchingMoviesAction = (name) => {
             return `${name} likes to watch movies`;
         };
     </code></pre>
 
-                <p>
-                    If an arrow function only contains a single expression, the braces and the
-                    <code>return</code> keyword can be left out. The value of the expression will then
-                    be returned automatically.
-                </p>
+        <p>
+            If an arrow function only contains a single expression, the braces and the
+            <code>return</code> keyword can be left out. The value of the expression will then
+            be returned automatically.
+        </p>
 
-                <pre><code>
+        <pre><code>
         const watchingMoviesAction = (name) => `${name} likes to watch movies`;
     </code></pre>
 
-                <section>
-                    <h3>Functions as values and callbacks</h3>
+        <section>
+            <h3>Functions as values and callbacks</h3>
 
-                    <p>
-                        Functions are first-class citizens in JavaScript. This means that functions
-                        can be treated like other values. They can for example be assigned to variables
-                        and passed as arguments to other functions.
-                    </p>
+            <p>
+                Functions are first-class citizens in JavaScript. This means that functions
+                can be treated like other values. They can for example be assigned to variables
+                and passed as arguments to other functions.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             function genericActionPerformer(name, action) {
                 return action(name);
             }
@@ -433,109 +405,109 @@
             genericActionPerformer("Elias", playingGuitarAction);
         </code></pre>
 
-                    <p>
-                        The second argument in the call to <code>genericActionPerformer()</code> is a
-                        reference to the function <code>playingGuitarAction</code>. There are no
-                        parentheses after the function name, so the function is not called at this point.
-                        The reference is assigned to the parameter <code>action</code>.
-                    </p>
+            <p>
+                The second argument in the call to <code>genericActionPerformer()</code> is a
+                reference to the function <code>playingGuitarAction</code>. There are no
+                parentheses after the function name, so the function is not called at this point.
+                The reference is assigned to the parameter <code>action</code>.
+            </p>
 
-                    <p>
-                        Inside <code>genericActionPerformer()</code> the statement
-                        <code>action(name)</code> calls the function that was passed as an argument.
-                        In this example <code>name</code> contains the value <code>"Elias"</code>,
-                        so <code>playingGuitarAction()</code> is called with that value.
-                    </p>
+            <p>
+                Inside <code>genericActionPerformer()</code> the statement
+                <code>action(name)</code> calls the function that was passed as an argument.
+                In this example <code>name</code> contains the value <code>"Elias"</code>,
+                so <code>playingGuitarAction()</code> is called with that value.
+            </p>
 
-                    <p>
-                        A function passed to another function like this is a callback function. The
-                        function receiving the callback can decide when to call it.
-                    </p>
+            <p>
+                A function passed to another function like this is a callback function. The
+                function receiving the callback can decide when to call it.
+            </p>
 
-                    <p>
-                        Adding parentheses when passing the function would make an important difference.
-                    </p>
+            <p>
+                Adding parentheses when passing the function would make an important difference.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             genericActionPerformer("Elias", playingGuitarAction());
         </code></pre>
 
-                    <p>
-                        Here <code>playingGuitarAction()</code> is called first and its returned value
-                        is passed to <code>genericActionPerformer()</code>. The returned value is a
-                        string and not a function reference. When <code>genericActionPerformer()</code>
-                        later tries to call <code>action(name)</code>, it would therefore be trying to
-                        call a string as a function.
-                    </p>
-                </section>
-            </section>
+            <p>
+                Here <code>playingGuitarAction()</code> is called first and its returned value
+                is passed to <code>genericActionPerformer()</code>. The returned value is a
+                string and not a function reference. When <code>genericActionPerformer()</code>
+                later tries to call <code>action(name)</code>, it would therefore be trying to
+                call a string as a function.
+            </p>
+        </section>
+    </section>
 
-            <section>
-                <h2>Random numbers</h2>
+    <section>
+        <h2 id="random-numbers">Random numbers</h2>
 
-                <p>
-                    <code>Math.random()</code> returns a number from 0 inclusive to 1 exclusive.
-                    That means that 0 is a possible value, but 1 is not.
-                </p>
+        <p>
+            <code>Math.random()</code> returns a number from 0 inclusive to 1 exclusive.
+            That means that 0 is a possible value, but 1 is not.
+        </p>
 
-                <pre><code>
+        <pre><code>
         Math.random();
         // 0 <= result < 1
     </code></pre>
 
-                <p>
-                    To generate random integers in a specific range we can scale this value and use
-                    <code>Math.floor()</code>. <code>Math.floor()</code> rounds down to the nearest
-                    integer. It does not exclude 0. If the value is 0, <code>Math.floor(0)</code>
-                    is also 0.
-                </p>
+        <p>
+            To generate random integers in a specific range we can scale this value and use
+            <code>Math.floor()</code>. <code>Math.floor()</code> rounds down to the nearest
+            integer. It does not exclude 0. If the value is 0, <code>Math.floor(0)</code>
+            is also 0.
+        </p>
 
-                <p>
-                    This function returns a random integer where both <code>min</code> and
-                    <code>max</code> are included:
-                </p>
+        <p>
+            This function returns a random integer where both <code>min</code> and
+            <code>max</code> are included:
+        </p>
 
-                <pre><code>
+        <pre><code>
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1) + min);
         }
     </code></pre>
 
-                <p>
-                    <code>max - min + 1</code> gives the number of possible integer values in the
-                    range. The extra 1 is needed because both ends of the range are included.
-                    Adding <code>min</code> moves the lowest possible result from 0 to the value
-                    given as <code>min</code>.
-                </p>
-            </section>
+        <p>
+            <code>max - min + 1</code> gives the number of possible integer values in the
+            range. The extra 1 is needed because both ends of the range are included.
+            Adding <code>min</code> moves the lowest possible result from 0 to the value
+            given as <code>min</code>.
+        </p>
+    </section>
 
-            <section>
-                <h2>Date and time</h2>
+    <section>
+        <h2 id="date-time">Date and time</h2>
 
-                <p>
-                    JavaScript has a <code>Date</code> object for working with dates and time.
-                    Calling <code>new Date()</code> creates a new Date object containing the
-                    current date and time.
-                </p>
+        <p>
+            JavaScript has a <code>Date</code> object for working with dates and time.
+            Calling <code>new Date()</code> creates a new Date object containing the
+            current date and time.
+        </p>
 
-                <pre><code>
+        <pre><code>
             const currentDate = new Date();
         </code></pre>
 
-                <p>
-                    The variable contains a reference to the Date object. The <code>new</code>
-                    keyword creates a new instance using <code>Date</code> as a constructor.
-                </p>
+        <p>
+            The variable contains a reference to the Date object. The <code>new</code>
+            keyword creates a new instance using <code>Date</code> as a constructor.
+        </p>
 
-                <section>
-                    <h3>Getting values from a Date</h3>
+        <section>
+            <h3>Getting values from a Date</h3>
 
-                    <p>
-                        A Date object has methods for getting the different parts of the date
-                        and time.
-                    </p>
+            <p>
+                A Date object has methods for getting the different parts of the date
+                and time.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const currentDate = new Date();
 
             currentDate.getFullYear();
@@ -548,34 +520,34 @@
             currentDate.getSeconds();
         </code></pre>
 
-                    <p>
-                        <code>getFullYear()</code> returns the year.
-                        <code>getMonth()</code> returns the month as a zero-indexed value from
-                        0 to 11. January is therefore 0 and December is 11.
-                    </p>
+            <p>
+                <code>getFullYear()</code> returns the year.
+                <code>getMonth()</code> returns the month as a zero-indexed value from
+                0 to 11. January is therefore 0 and December is 11.
+            </p>
 
-                    <p>
-                        <code>getDate()</code> returns the day of the month from 1 to 31.
-                        This should not be confused with <code>getDay()</code>, which returns
-                        the weekday as a zero-indexed value from 0 to 6, starting with Sunday.
-                    </p>
+            <p>
+                <code>getDate()</code> returns the day of the month from 1 to 31.
+                This should not be confused with <code>getDay()</code>, which returns
+                the weekday as a zero-indexed value from 0 to 6, starting with Sunday.
+            </p>
 
-                    <p>
-                        The time methods return hours from 0 to 23 and minutes and seconds
-                        from 0 to 59.
-                    </p>
-                </section>
+            <p>
+                The time methods return hours from 0 to 23 and minutes and seconds
+                from 0 to 59.
+            </p>
+        </section>
 
-                <section>
-                    <h3>Zero-indexed months</h3>
+        <section>
+            <h3>Zero-indexed months</h3>
 
-                    <p>
-                        Because <code>getMonth()</code> returns a zero-indexed month, the value
-                        can be used directly as an index in an array where January is the first
-                        element.
-                    </p>
+            <p>
+                Because <code>getMonth()</code> returns a zero-indexed month, the value
+                can be used directly as an index in an array where January is the first
+                element.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const months = [
                 'January',
                 'February',
@@ -596,129 +568,131 @@
             console.log(months[currentDate.getMonth()]);
         </code></pre>
 
-                    <p>
-                        The numeric Date constructor also uses zero-indexed months.
-                    </p>
+            <p>
+                The numeric Date constructor also uses zero-indexed months.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const date = new Date(2026, 8, 29);
             // September 29, 2026
+            // Notice that the value 8 for month is september and not august
         </code></pre>
-                </section>
+        </section>
 
-                <section>
-                    <h3>Timestamps and durations</h3>
+        <section>
+            <h3>Timestamps and durations</h3>
 
-                    <p>
-                        <code>Date.now()</code> returns a number containing the number of
-                        milliseconds since January 1, 1970 UTC. This point in time is called
-                        the Unix epoch.
-                    </p>
+            <p>
+                <code>Date.now()</code> returns a number containing the number of
+                milliseconds since January 1, 1970 UTC. This point in time is called
+                the Unix epoch.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const timestamp = Date.now();
 
             console.log(typeof timestamp);
             // number
         </code></pre>
 
-                    <p>
-                        Dates can also be subtracted from each other. The result is a number
-                        containing the duration between the dates in milliseconds.
-                    </p>
+            <p>
+                Dates can also be subtracted from each other. The result is a number
+                containing the duration between the dates in milliseconds, because the Date() 
+                objects are coerced.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const timelineStart = new Date('1950-01-01');
             const timelineEnd = new Date('2100-01-01');
 
             const totalTimeline = timelineEnd - timelineStart;
         </code></pre>
 
-                    <p>
-                        This makes it possible to use dates in calculations. For example, the
-                        position of a date on a timeline can be calculated from its distance
-                        from the beginning compared with the complete duration.
-                    </p>
+            <p>
+                This makes it possible to use dates in calculations. For example, the
+                position of a date on a timeline can be calculated from its distance
+                from the beginning compared with the complete duration.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const distance = date - timelineStart;
             const position = (distance / totalTimeline) * 100;
         </code></pre>
-                </section>
+        </section>
 
-                <section>
-                    <h3>Formatting dates</h3>
+        <section>
+            <h3>Formatting dates</h3>
 
-                    <p>
-                        We can create our own arrays of month and weekday names, but JavaScript
-                        can also format dates according to a locale with
-                        <code>toLocaleDateString()</code>.
-                    </p>
+            <p>
+                We can create our own arrays of month and weekday names, but JavaScript
+                can also format dates according to a locale with
+                <code>toLocaleDateString()</code>.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const currentDate = new Date();
 
             const month = currentDate.toLocaleDateString(
-                'en-GB',
+                'en-uk',
                 { month: 'long' }
             );
 
             const weekday = currentDate.toLocaleDateString(
-                'en-GB',
+                'en-uk',
                 { weekday: 'long' }
             );
         </code></pre>
 
-                    <p>
-                        The locale controls how the date is formatted. Using
-                        <code>'long'</code> for the month or weekday asks for the complete
-                        written name instead of an abbreviated or numeric version.
-                    </p>
+            <p>
+                The locale controls how the date is formatted. Using the option
+                <code>'long'</code> for the month or weekday asks for the complete
+                written name instead of an abbreviated or numeric version.
+            </p>
 
-                    <p>
-                        Using an array together with <code>getMonth()</code> is a simple way
-                        of translating the zero-indexed month ourselves.
-                        <code>toLocaleDateString()</code> is a more developed solution when
-                        the date should be formatted for a particular locale.
-                    </p>
-                </section>
+            <p>
+                Using an array together with <code>getMonth()</code> is a simple way
+                of translating the zero-indexed month ourselves.
+                <code>toLocaleDateString()</code> is a more developed solution when
+                the date should be formatted for a particular locale.
+            </p>
+        </section>
 
-                <section>
-                    <h3>UTC and local time</h3>
+        <section>
+            <h3>UTC and local time</h3>
 
-                    <p>
-                        UTC is a common time standard that does not depend on a particular
-                        local time zone. The same moment can have a different displayed clock
-                        time depending on the local time zone.
-                    </p>
+            <p>
+                UTC is a common time standard that does not depend on a particular
+                local time zone. The same moment can have a different displayed clock
+                time depending on the local time zone.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             2026-09-18T08:03:15.983Z
         </code></pre>
 
-                    <p>
-                        The <code>Z</code> at the end of an ISO timestamp indicates UTC and
-                        is also called Zulu time.
-                    </p>
-                </section>
-            </section>
+            <p>
+                The <code>Z</code> at the end of an ISO 8601 timestamp indicates UTC and
+                is also called Zulu time.
+            </p>
+        </section>
+    </section>
 
-            <section>
-                <h2>Loops and loop methods</h2>
+    <section>
+        <h2 id="loops-loop-methods">Loops and loop methods</h2>
 
-                <p>
-                    Rule for the course: prefer loop methods when working with arrays. Traditional
-                    loops can still be useful when the problem is naturally based on counting.
-                </p>
+        <p>
+            Rule for the course: prefer loop methods when working with arrays. Traditional
+            loops can still be useful when a specific iteration is needed.
+        </p>
 
-                <section>
-                    <h3>for...of and for...in</h3>
+        <section>
+            <h3>for...of and for...in</h3>
 
-                    <p>
-                        <code>for...of</code> can be used to iterate through the values of an array.
-                    </p>
+            <p>
+                <code>for...of</code> can be used to iterate through the values of an array.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const numbers = [4, 5, 6];
 
             for (const number of numbers) {
@@ -730,24 +704,24 @@
             // 6
         </code></pre>
 
-                    <p>
-                        <code>for...in</code> instead iterates through property keys. Arrays are also
-                        objects in JavaScript, so when it is used on an array the keys will normally
-                        be the indexes rather than the values. For arrays we will normally use
-                        <code>for...of</code> or an array loop method instead.
-                    </p>
-                </section>
+            <p>
+                <code>for...in</code> instead iterates through property keys. Arrays are also
+                objects in JavaScript, so when it is used on an array the keys will normally
+                be the indexes rather than the values. For arrays we will normally use
+                <code>for...of</code> or an array loop method instead.
+            </p>
+        </section>
 
-                <section>
-                    <h3>forEach</h3>
+        <section>
+            <h3>forEach</h3>
 
-                    <p>
-                        <code>forEach()</code> calls a callback function once for each element in an
-                        array. It is useful when we want something to happen for each element without
-                        creating a new result array.
-                    </p>
+            <p>
+                <code>forEach()</code> calls a callback function once for each element in an
+                array. It is useful when we want something to happen for each element without
+                creating a new result array. The return from .forEach is always undefined.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const numbers = [1, 2, 3, 4, 5];
 
             numbers.forEach((number) => {
@@ -755,97 +729,97 @@
             });
         </code></pre>
 
-                    <p>
-                        The callback can receive the current value, the index and the complete array.
-                        <code>forEach()</code> itself returns <code>undefined</code>.
-                    </p>
-                </section>
+            <p>
+                The callback can receive the current value, the index and the complete array.
+                <code>forEach()</code> itself returns <code>undefined</code>.
+            </p>
+        </section>
 
-                <section>
-                    <h3>map</h3>
+        <section>
+            <h3>map</h3>
 
-                    <p>
-                        <code>map()</code> is used when we want to transform every element and keep
-                        the resulting values. The return value from each callback call is collected
-                        into a new array.
-                    </p>
+            <p>
+                <code>map()</code> is used when we want to transform every element and keep
+                the resulting values. The return value from each callback call is collected
+                into a new array.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const numbers = [1, 2, 3, 4, 5];
 
-            const doubledNumbers = numbers.map((number) => number * 2);
+            const doubledNumbers = numbers.map(number => number * 2);
 
             // doubledNumbers: [2, 4, 6, 8, 10]
             // numbers:        [1, 2, 3, 4, 5]
         </code></pre>
 
-                    <p>
-                        There is a one-to-one relationship between the original array and the returned
-                        array. One value is returned by the callback for every element in the original
-                        array.
-                    </p>
-                </section>
+            <p>
+                There is a one-to-one relationship between the length of the original array 
+                and the returned array. One value is returned by the callback for every
+                element in the original array.
+            </p>
+        </section>
 
-                <section>
-                    <h3>filter</h3>
+        <section>
+            <h3>filter</h3>
 
-                    <p>
-                        <code>filter()</code> is used to create a new array containing only the elements
-                        that pass a condition. The callback returns a boolean value that
-                        <code>filter()</code> uses to decide if the element should be included.
-                    </p>
+            <p>
+                <code>filter()</code> is used to create a new array containing only the elements
+                that pass a condition. The callback returns a boolean value that
+                <code>filter()</code> uses to decide if the element should be included.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const countriesWithGDPBelowThousand = countries.filter(
-                (country) => country.gdp < 1000
+                country => country.gdp < 1000
             );
         </code></pre>
 
-                    <p>
-                        Unlike <code>map()</code>, the returned array can contain fewer elements than
-                        the original array because some elements can be filtered out.
-                    </p>
-                </section>
+            <p>
+                Unlike <code>map()</code>, the returned array can contain fewer elements than
+                the original array because some elements can be filtered out.
+            </p>
+        </section>
 
-                <section>
-                    <h3>find and findIndex</h3>
+        <section>
+            <h3>find and findIndex</h3>
 
-                    <p>
-                        <code>find()</code> returns the first element that matches a condition.
-                        If no element matches, it returns <code>undefined</code>.
-                    </p>
+            <p>
+                <code>find()</code> returns the first element that matches a condition.
+                If no element matches, it returns <code>undefined</code>.
+            </p>
 
-                    <pre><code>
-            const foundAnimal = animals.find((animal) => animal.id === id);
+            <pre><code>
+            const foundAnimal = animals.find(animal => animal.id === id);
         </code></pre>
 
-                    <p>
-                        <code>findIndex()</code> works with a condition in the same way, but returns
-                        the index of the matching element instead. If there is no match it returns
-                        <code>-1</code>.
-                    </p>
+            <p>
+                <code>findIndex()</code> works with a condition in the same way, but returns
+                the index of the matching element instead. If there is no match it returns
+                <code>-1</code>.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const foundAnimalIndex = animals.findIndex(
-                (animal) => animal.id === id
+                animal => animal.id === id
             );
         </code></pre>
 
-                    <p>
-                        The index is useful when we need to change or remove an element at a specific
-                        position in an array.
-                    </p>
-                </section>
+            <p>
+                The index is useful when we need to change or remove an element at a specific
+                position in an array.
+            </p>
+        </section>
 
-                <section>
-                    <h3>reduce</h3>
+        <section>
+            <h3>reduce</h3>
 
-                    <p>
-                        <code>reduce()</code> can reduce the values of an array into one result.
-                        An example could be calculating the sum of all numbers in an array.
-                    </p>
+            <p>
+                <code>reduce()</code> can reduce the values of an array into one result.
+                An example could be calculating the sum of all numbers in an array.
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const numbers = [1, 2, 3, 4, 5];
 
             const sum = numbers.reduce(
@@ -856,43 +830,43 @@
             // 15
         </code></pre>
 
-                    <p>
-                        The last argument, <code>0</code>, is the initial value of the accumulator.
-                        For every element the callback receives the current accumulator and the current
-                        value. The returned result becomes the accumulator used for the next element.
-                    </p>
-                </section>
+            <p>
+                The last argument, <code>0</code>, is the initial value of the accumulator.
+                For every element the callback receives the current accumulator and the current
+                value. The returned result becomes the accumulator used for the next element.
+            </p>
+        </section>
 
-                <section>
-                    <h3>Side effects and references</h3>
+        <section>
+            <h3>Side effects and references</h3>
 
-                    <p>
-                        Creating a new array with a loop method does not automatically mean that the
-                        objects inside it are copies. Objects are reference types, so two arrays can
-                        contain references to the same object.
-                    </p>
+            <p>
+                Creating a new array with a loop method does not automatically mean that the
+                objects inside it are independent copies. Objects are reference types, so two
+                arrays can contain references to the same object(s).
+            </p>
 
-                    <pre><code>
+            <pre><code>
             const countriesWithGDPBelowThousand = countries.filter(
-                (country) => country.gdp < 1000
+                country => country.gdp < 1000
             );
 
             countriesWithGDPBelowThousand[0].gdp = 2000;
         </code></pre>
 
-                    <p>
-                        If the object in both arrays is the same object, changing its
-                        <code>gdp</code> property through one reference will also be visible through
-                        the other reference. The property of the existing object has been mutated.
-                    </p>
+            <p>
+                If the object in both arrays is the same object, changing its
+                <code>gdp</code> property through one reference will also be visible through
+                the other reference. The property of the existing object has been mutated.
+            </p>
 
-                    <p>
-                        When we want to transform objects without changing the existing objects, we
-                        can instead create new objects.
-                    </p>
+            <p>
+                When we want to transform objects without changing the existing objects, we
+                can instead create new objects.
+            </p>
 
-                    <pre><code>
-            const countriesWithGDPUpdated = countries.map((country) => {
+            <pre><code>
+            const countriesWithGDPUpdated = countries.map(country => {
                 return {
                     ...country,
                     gdp: country.gdp * 2
@@ -900,20 +874,11 @@
             });
         </code></pre>
 
-                    <p>
-                        The spread syntax copies the properties from <code>country</code> into a new
-                        object. The <code>gdp</code> property comes afterwards and therefore replaces
-                        the copied value with the new value. The original object is not mutated.
-                    </p>
-                </section>
-            </section>
+            <p>
+                The spread syntax copies the properties from <code>country</code> into a new
+                object. The <code>gdp</code> property comes afterwards and therefore replaces
+                the copied value with the new value. The original object is not mutated.
+            </p>
         </section>
-
-    </main>
-
-    <footer>
-        <p>This is the footer</p>
-    </footer>
-</body>
-
-</html>
+    </section>
+</article>

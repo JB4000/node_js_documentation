@@ -1,37 +1,1035 @@
-<!DOCTYPE html>
-<html lang="en">
+<article class="documentation-content">
+    <h1>Modules, Static Files & Deployment</h1>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modules, Static Files & Deployment</title>
-    <link rel="stylesheet" href="/pico/pico.min.css">
-    <link rel="stylesheet" href="/styles/main.css">
-</head>
 
-<body>
-    <header>
-        <p>Node.js Course Documentation</p>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/javascript">JavaScript</a></li>
-                <li><a href="/nodejs">Node.js & Tools</a></li>
-                <li><a href="/express">Express & HTTP</a></li>
-                <li><a href="/rest-api">REST APIs</a></li>
-                <li><a href="/frontend-security">Frontend & Security</a></li>
-                <li><a href="/modules-deployment">Modules, Static Files & Deployment</a></li>
-            </ul>
-        </nav>
-    </header>
+    <section>
+        <h2 id="code-organization">Code organization with modules</h2>
 
-    <main>
-        <h1>Modules, Static Files & Deployment</h1>
-    </main>
+        <p>
+            As an application grows, keeping all our code in one file makes it harder
+            to understand and maintain. We can use modules to split our code into
+            smaller files with their own responsibilities. In this section we will
+            use ES Modules and not CommonJS.
+        </p>
 
-    <footer>
-        <p>This is the footer</p>
-    </footer>
-</body>
+        <p>
+            In JavaScript, we can use <code>export</code> to make functionality
+            available to other modules and <code>import</code> to use it.
+        </p>
 
-</html>
+        <h3>Import and export</h3>
+
+        <p>For example, we can define a function in <code>math.js</code>:</p>
+
+        <pre><code class="language-javascript">export function add(a, b) {
+    return a + b;
+}</code></pre>
+
+        <p>We can then import and use it in <code>app.js</code>:</p>
+
+        <pre><code class="language-javascript">import { add } from "./math.js";
+
+console.log(add(2, 3));</code></pre>
+
+        <p>
+            This allows us to reuse functionality without putting all the code
+            in the same file.
+        </p>
+
+        <h3>Single responsibility</h3>
+
+        <p>
+            The single responsibility principle means that a module should have
+            one clear responsibility.
+        </p>
+
+        <p>
+            This does not mean that every function needs its own file. A module
+            can contain several related functions that work together to handle
+            the same responsibility.
+        </p>
+
+        <p>
+            For example, a module responsible for calculations could contain
+            functions for addition, subtraction and multiplication.
+        </p>
+
+        <h3>Separation of concerns</h3>
+
+        <p>
+            Separation of concerns means organizing different parts of an
+            application so that they handle different tasks.
+        </p>
+
+        <p>
+            For example, code that handles HTTP requests should not necessarily
+            be responsible for every detail of how HTML is constructed.
+        </p>
+
+        <p>
+            Keeping these concerns separate makes the code easier to understand,
+            change and test.
+        </p>
+
+        <h3>Encapsulation and abstraction</h3>
+
+        <p>
+            Encapsulation means keeping related functionality and its internal
+            details together.
+        </p>
+
+        <p>
+            A module can export the functions other files need while keeping
+            helper functions invisible.
+        </p>
+
+        <p>
+            Abstraction means hiding unnecessary details behind
+            a simpler interface.
+        </p>
+
+        <p>
+            For example, another module might call a function named
+            <code>calculateTotal()</code> without needing to know every step
+            of the calculation.
+        </p>
+
+        <p>Some differences:</p>
+
+        <ul>
+            <li>
+                <strong>Encapsulation</strong> is keeping related code
+                and internal details together.
+            </li>
+            <li>
+                <strong>Abstraction</strong> is about exposing what other code
+                needs without it having to understand how it works
+                internally.
+            </li>
+        </ul>
+
+        <h3>Module dependencies</h3>
+
+        <p>
+            When one module imports another, it depends on that module.
+            For example, in the Planter project from class, the modules
+            are connected like this:
+        </p>
+
+        <pre><code>app.js
+  ├──→ templatingEngine/pages.js
+  │          └──→ templatingEngine/templatingEngine.js
+  └──→ util/fetchPlants.js</code></pre>
+
+        <p>
+            The arrows show which modules import other modules.
+        </p>
+
+        <p>
+            <code>app.js</code> imports prepared pages from
+            <code>pages.js</code> and functions for fetching plant data
+            from <code>fetchPlants.js</code>.
+        </p>
+
+        <p>
+            <code>pages.js</code> imports <code>constructPage()</code>
+            and <code>readPage()</code> from <code>templatingEngine.js</code>.
+        </p>
+
+        <p>
+            This means <code>app.js</code> can use the prepared pages without
+            needing to know how the templating functions work internally.
+            Each module has a different responsibility, and the imports
+            show how they depend on each other.
+        </p>
+
+        <h3>When should we create a new module?</h3>
+
+        <p>We could consider creating a new module when:</p>
+
+        <ul>
+            <li>A file starts handling several different responsibilities.</li>
+            <li>We want to reuse functionality in multiple places.</li>
+            <li>Several functions belong together and form a clear responsibility.</li>
+            <li>A file becomes difficult to navigate or understand.</li>
+            <li>We want to have to change code at only one place instead of multiple places.</li>
+        </ul>
+
+        <p>
+            The point is not to create as many files as possible. It is to
+            organize the code in a way that makes the application easier
+            to understand and change.
+        </p>
+
+        <h3>Using modules in Express</h3>
+
+        <p>
+            In an Express application, we can use modules to separate route
+            handling, reusable functionality and page construction.
+        </p>
+
+    </section>
+
+    <section>
+        <h2 id="static-files">Serving static files</h2>
+
+        <p>
+            The browser needs access to files like HTML, CSS, images and client side
+            JavaScript to render and run a page. These files can be served as static
+            files with middleware in Express.
+        </p>
+
+        <pre><code>app.use(express.static('public'));</code></pre>
+
+        <p>
+            This statement tells Express to serve static files from the
+            <code>public</code> folder. The browser can then request files from this
+            folder directly without us manually creating a route for every file.
+        </p>
+
+        <p>
+            The path used by the browser is not the same as the physical path in the
+            project. The <code>public</code> folder becomes a virtual root for the
+            static files.
+        </p>
+
+        <pre><code>public/
+    frontpage/
+        index.html
+        frontpage.css
+        frontpage.js</code></pre>
+
+        <p>
+            A CSS file that is located at
+            <code>public/frontpage/frontpage.css</code> can therefore be requested
+            from the browser with:
+        </p>
+
+        <pre><code>&lt;link rel="stylesheet" href="/frontpage/frontpage.css"&gt;</code></pre>
+
+        <p>
+            The browser does not use <code>/public/frontpage/frontpage.css</code>
+            because <code>public</code> is already the root of the files that the
+            middleware is serving.
+        </p>
+
+        <h3>Limiting access to files</h3>
+
+        <p>
+            We do not want the browser to have access to any random file in the
+            project. A useful safety default is to deny access by default and
+            explicitly allow what is needed.
+        </p>
+
+        <p>
+            The browser needs HTML, CSS, images and client side JavaScript, so there
+            is a reason to make these files available. Server files like
+            <code>app.js</code>, <code>package.json</code>
+            have no reason to be available to the browser.
+        </p>
+
+        <p>
+            This is not decided by the file extension itself. A JavaScript file can
+            be a client side file that should be served to the browser, while another
+            JavaScript file can contain server code that should not be available. What
+            matters is which files we have explicitly made available.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="cdn-local">CDN versus local resources</h2>
+
+        <p>
+            When we use external libraries like Pico CSS or Highlight.js, we need
+            to decide where the browser should load their files from.
+        </p>
+
+        <p>
+            We can use a CDN or serve the files locally from our own application.
+        </p>
+
+        <h3>Content Delivery Network (CDN)</h3>
+
+        <p>
+            CDN stands for Content Delivery Network.
+        </p>
+
+        <p>
+            A CDN is a network of servers that can deliver files such as CSS,
+            JavaScript and images to users.
+        </p>
+
+        <p>
+            The servers can be located in different geographical areas.
+            This means the browser might be able to download a file from
+            a server that is closer to the user.
+        </p>
+
+        <p>
+            Using a CDN can also reduce the amount of traffic our own server
+            needs to handle.
+        </p>
+
+        <p>
+            But we depend on the external CDN being available. If the CDN
+            has problems, the browser might not be able to load the files.
+        </p>
+
+        <h3>Serving resources locally</h3>
+
+        <p>
+            Instead of using a CDN, we can install a library with npm and
+            serve its files from our own Express application.
+        </p>
+
+        <p>
+            We can use <code>express.static()</code> to make the required
+            files available to the browser.
+        </p>
+
+        <p>
+            This gives us more control over which version of the library
+            we use, and we do not depend on an external CDN to deliver it.
+        </p>
+
+        <p>
+            But our own server must handle the requests for these files.
+        </p>
+
+        <h3>Example from this website</h3>
+
+        <p>
+            This documentation website uses Pico CSS for styling and
+            Highlight.js for syntax highlighting in code examples.
+        </p>
+
+        <p>
+            Both libraries are installed through npm and served locally
+            by Express instead of being loaded from a CDN.
+        </p>
+
+        <p>
+            This means the browser requests the library files from our
+            Express application, just like it requests our own CSS and
+            JavaScript files.
+        </p>
+
+        <p>
+            We can manage the library versions through our project's npm
+            dependencies and do not need an external CDN to deliver them.
+        </p>
+
+        <h3>Which approach to use?</h3>
+
+        <p>
+            It depends.
+        </p>
+
+        <p>
+            A CDN can be useful because it distributes files across
+            different servers and can improve loading performance.
+        </p>
+
+        <p>
+            Serving files locally can be useful when we want more control
+            over the resources our application depends on.
+        </p>
+
+        <p>
+            We should consider performance, reliability and control
+            when choosing between the two.
+        </p>
+    </section>
+
+    <section>
+        <h3>Root-relative and relative URLs</h3>
+
+        <p>
+            When we reference a CSS file, JavaScript file or another
+            page in HTML, we can use different types of URLs.
+        </p>
+
+        <p>
+            A root-relative URL starts with <code>/</code>.
+            This means the path starts from the root of the website,
+            regardless of which page the browser is currently on.
+        </p>
+
+        <p>
+            In our documentation project we use:
+        </p>
+
+        <pre><code>
+            &lt;link rel="stylesheet" href="/styles/main.css"&gt;
+        </code></pre>
+
+        <p>
+            Express serves this file from
+            <code>public/styles/main.css</code> because we have
+            configured <code>public</code> as the static root.
+        </p>
+
+        <p>
+            The same URL works from different pages, for example
+            <code>/frontend</code>, <code>/express</code> and
+            <code>/nodejs</code>.
+        </p>
+
+        <section>
+            <h4>Relative URLs</h4>
+
+            <p>
+                A relative URL does not start with <code>/</code>.
+                The browser resolves it relative to the current
+                document URL.
+            </p>
+
+            <pre><code>
+            &lt;link rel="stylesheet" href="styles/main.css"&gt;
+        </code></pre>
+
+            <p>
+                If the current page is <code>/frontend</code>,
+                the browser resolves this example to
+                <code>/styles/main.css</code>.
+            </p>
+
+            <p>
+                But if the current page is
+                <code>/frontend/frontend.html</code>, the browser
+                resolves it to
+                <code>/frontend/styles/main.css</code>.
+            </p>
+
+            <p>
+                This means the same relative URL can point to
+                different locations depending on the page URL.
+            </p>
+        </section>
+
+        <section>
+            <h4>Shared assets</h4>
+
+            <p>
+                Our documentation website has several pages that
+                use the same stylesheet.
+            </p>
+
+            <p>
+                Instead of having a separate copy of the stylesheet
+                in every folder, we can keep one shared file
+                inside <code>public/styles</code>.
+            </p>
+
+            <p>
+                Each HTML page can reference that stylesheet using
+                the same root-relative URL:
+            </p>
+
+            <pre><code>
+            &lt;link rel="stylesheet" href="/styles/main.css"&gt;
+        </code></pre>
+
+            <p>
+                This makes the paths consistent across the website.
+                It also means that when we update the shared CSS file,
+                the changes can affect all the pages that use it.
+            </p>
+        </section>
+    </section>
+
+    <section>
+        <h2 id="javascript-modules">JavaScript modules</h2>
+
+        <p>
+            As a project grows it makes sense to split the code into different files.
+            This creates the question of how code in one file can use functions and
+            variables from another file.
+        </p>
+
+        <p>
+            We also do not necessarily want everything in a file to be accessible
+            from other files. Some functions and variables might only be used
+            internally in that file, while others are meant to be used by the rest
+            of the application.
+        </p>
+
+        <p>
+            Modules give us a way to control this. A module can
+            <code>export</code> the values that should be available to other modules.
+            Another module can then <code>import</code> the values that it needs.
+        </p>
+
+        <h3>Named exports</h3>
+
+        <p>
+            We can export specific functions and variables by name:
+        </p>
+
+        <pre><code>const animals = ['Cat', 'Dog'];
+
+function getAnimals() {
+    return animals;
+}
+
+function calculateSecretId() {
+    return 42;
+}
+
+export {
+    animals,
+    getAnimals
+};</code></pre>
+
+        <p>
+            In this example <code>animals</code> and <code>getAnimals</code> are
+            exported. They are now available for other modules to import.
+            <code>calculateSecretId</code> is not exported and is therefore only
+            available internally in this module.
+        </p>
+
+        <p>
+            An importing module does not have to import everything that has been
+            exported. It can choose only the values that it needs:
+        </p>
+
+        <pre><code>import { getAnimals } from './animalService.js';
+
+getAnimals();</code></pre>
+
+        <p>
+            <code>getAnimals</code> is a named export, so the name is written inside
+            curly braces in the import. After it has been imported it can be used
+            directly in this file.
+        </p>
+
+        <p>
+            Even though <code>animals</code> was also exported, it was not imported
+            here. It is available to import, but it is not available by name in this
+            file unless we import it.
+        </p>
+
+        <h3>Exporting when declaring a value</h3>
+
+        <p>
+            The <code>export</code> keyword can also be written directly where a
+            function or variable is declared:
+        </p>
+
+        <pre><code>export const animals = ['Cat', 'Dog'];
+
+export function getAnimals() {
+    return animals;
+}</code></pre>
+
+        <p>
+            This has the same purpose as declaring the values first and listing them
+            in an export afterwards. Both examples create named exports.
+        </p>
+
+        <h3>Default exports</h3>
+
+        <p>
+            A module can also have a default export. A default export is one value that
+            is chosen as the default value to export from the module.
+        </p>
+
+        <p>
+            For example, we can put several functions in an object and export that
+            object as the default:
+        </p>
+
+        <pre><code>function getAnimals() {
+    return ['Cat', 'Dog'];
+}
+
+function createAnimal(name) {
+    return { name };
+}
+
+export default {
+    getAnimals,
+    createAnimal
+};</code></pre>
+
+        <p>
+            The curly braces in this example create an object. The object has the
+            properties <code>getAnimals</code> and <code>createAnimal</code>, and the
+            complete object is the one value that is exported as default.
+        </p>
+
+        <p>
+            There are no parentheses after the function names in the object, so the
+            functions are not called here. References to the functions are stored as
+            values in the object.
+        </p>
+
+        <p>
+            A default export is imported without curly braces:
+        </p>
+
+        <pre><code>import animalService from './animalService.js';
+
+animalService.getAnimals();
+animalService.createAnimal('Otter');</code></pre>
+
+        <p>
+            The name <code>animalService</code> is chosen in the importing file. Because
+            this is a default import, it does not have to match a name from the exporting
+            file. We could for example have called it <code>service</code> instead.
+        </p>
+
+        <p>
+            The imported value is an object, so its functions are accessed as
+            properties with dot notation. <code>animalService.getAnimals</code> is a
+            reference to the function and <code>animalService.getAnimals()</code> calls
+            the function.
+        </p>
+
+        <h3>Named exports and default exports</h3>
+
+        <p>
+            Named exports and a default exported object can look quite similar, but the
+            curly braces do not mean the same thing:
+        </p>
+
+        <pre><code>export {
+    getAnimals,
+    createAnimal
+};</code></pre>
+
+        <p>
+            Here the curly braces are part of the syntax for named exports. Two values
+            are exported by name. They can be imported like this:
+        </p>
+
+        <pre><code>import { getAnimals, createAnimal } from './animalService.js';
+
+getAnimals();</code></pre>
+
+        <p>
+            In the following example the curly braces instead create an object:
+        </p>
+
+        <pre><code>export default {
+    getAnimals,
+    createAnimal
+};</code></pre>
+
+        <p>
+            There is now one default export, which is the object. If we import the
+            object as <code>animalService</code>, the functions are properties on that
+            object:
+        </p>
+
+        <pre><code>import animalService from './animalService.js';
+
+animalService.getAnimals();</code></pre>
+
+        <h3>ES Modules in the browser</h3>
+
+        <p>
+            If we want to use ES Modules in JavaScript that is run by the browser, the
+            browser has to know that the JavaScript file is a module. This can be
+            specified with <code>type="module"</code> on the script tag:
+        </p>
+
+        <pre><code>&lt;script type="module" src="/fruits/fruits.js"&gt;&lt;/script&gt;</code></pre>
+
+        <p>
+            The JavaScript file can then use ES Module syntax to import from another
+            JavaScript file:
+        </p>
+
+        <pre><code>import farm from './fruitOrchard.js';
+
+console.log(farm.fruitProcessingPlant());</code></pre>
+
+        <p>
+            In this example <code>farm</code> receives the default export from
+            <code>fruitOrchard.js</code>. The name <code>farm</code> is chosen in the
+            importing file because this is a default import.
+        </p>
+
+        <p>
+            <code>type="module"</code> is needed here because it is the browser that
+            loads and runs <code>fruits.js</code>. A setting in Node's
+            <code>package.json</code> does not tell the browser how it should interpret
+            this file.
+        </p>
+
+    </section>
+
+    <section>
+        <h2 id="nodejs-modules">Modules in Node.js</h2>
+
+        <p>
+            We first used CommonJS as the module system in Node.js. For example,
+            Express was imported with <code>require()</code>:
+        </p>
+
+        <pre><code>const express = require('express');</code></pre>
+
+        <p>
+            CommonJS uses <code>require()</code> to import a value from another
+            module and <code>module.exports</code> to define what a module exports.
+        </p>
+
+        <pre><code>function add(a, b) {
+    return a + b;
+}
+
+function subtract(a, b) {
+    return a - b;
+}
+
+module.exports = {
+    add,
+    subtract
+};</code></pre>
+
+        <p>
+            <code>module.exports</code> is assigned an object in this example. If
+            another file requires the module, the returned value is therefore this
+            object:
+        </p>
+
+        <pre><code>const calculator = require('./calculator.js');
+
+calculator.subtract(10, 3);</code></pre>
+
+        <p>
+            The name <code>calculator</code> is chosen in the file that imports the
+            module. It is a variable that contains a reference to the object that
+            was exported.
+        </p>
+
+        <h3>ES Modules in Node.js</h3>
+
+        <p>
+            We will use ES Modules instead of CommonJS going forward. Node.js has to
+            know that our <code>.js</code> files should be considered ES Modules.
+            This can be specified in <code>package.json</code>:
+        </p>
+
+        <pre><code>{
+    "type": "module"
+}</code></pre>
+
+        <p>
+            We can then use the same <code>import</code> and <code>export</code>
+            syntax that we use with ES Modules in the browser. Express can for
+            example be imported like this:
+        </p>
+
+        <pre><code>import express from 'express';</code></pre>
+
+        <p>
+            Our own files can also be imported as ES Modules:
+        </p>
+
+        <pre><code>import animalService from './util/animalService.js';</code></pre>
+
+        <p>
+            There is a difference between these two paths. <code>express</code>
+            refers to an installed package, while
+            <code>./util/animalService.js</code> is a relative path to one of our
+            own files. <code>./</code> means that the path starts relative to the
+            file where the import is written.
+        </p>
+
+        <h3>CommonJS and ES Modules</h3>
+
+        <p>
+            The two module systems therefore use different syntax for the same
+            general problem:
+        </p>
+
+        <pre><code>// CommonJS
+const calculator = require('./calculator.js');
+
+module.exports = {
+    add,
+    subtract
+};
+
+// ES Modules
+import { add, subtract } from './calculator.js';
+
+export {
+    add,
+    subtract
+};</code></pre>
+
+        <p>
+            One advantage of using ES Modules is that we can use the same module
+            system in both the browser and Node.js. We do not have to use ES Modules
+            in frontend JavaScript and then switch to CommonJS when working with
+            JavaScript on the server.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="nodejs-fetch">Fetching in Node.js</h2>
+
+        <p>
+            We have previously used <code>fetch()</code> in the browser to make an
+            HTTP request to our Node.js server. Node.js can also use
+            <code>fetch()</code> to make an HTTP request to another server.
+        </p>
+
+        <p>
+            This means that Node.js can have different roles in different HTTP
+            communications. When the browser sends a request to our Node.js server,
+            the browser is the client and Node.js is the server:
+        </p>
+
+        <pre><code>Browser  -- HTTP request --&gt;  Node.js
+client                       server</code></pre>
+
+        <p>
+            If Node.js then uses <code>fetch()</code> to make a request to Google,
+            Node.js is now the client in that communication:
+        </p>
+
+        <pre><code>Node.js  -- HTTP request --&gt;  Google
+client                       server</code></pre>
+
+        <p>
+            Client and server are therefore roles in a communication. Node.js can
+            act as a server when it receives a request from the browser and as a
+            client when it makes a request to another server.
+        </p>
+
+        <h3>Using Node.js as a proxy</h3>
+
+        <p>
+            We can combine the two communications. The browser can make a request
+            to our Express server, and code in the endpoint can make another HTTP
+            request to an external server.
+        </p>
+
+        <pre><code>app.get('/proxy', (req, res) =&gt; {
+    fetch('https://www.google.com/')
+        .then(response =&gt; response.text())
+        .then(result =&gt; res.send(result));
+});</code></pre>
+
+        <p>
+            First the browser makes an HTTP request to <code>/proxy</code>.
+            Express receives the request and matches it to the route. The callback
+            for the route then calls <code>fetch()</code>, which makes a new HTTP
+            request to Google.
+        </p>
+
+        <p>
+            <code>fetch()</code> returns a Promise. Node.js does not have to stop
+            doing other work while it waits for the response. When the response
+            arrives, the first <code>.then()</code> receives the response.
+        </p>
+
+        <p>
+            The body of the response from Google contains HTML, so
+            <code>response.text()</code> is used to read the body as text.
+            <code>response.text()</code> is also asynchronous and returns a
+            Promise.
+        </p>
+
+        <p>
+            When the text is available, the next <code>.then()</code> receives it
+            as <code>result</code>. <code>res.send(result)</code> then sends it in
+            the HTTP response from our Express server back to the browser.
+        </p>
+
+        <pre><code>Browser
+   |
+   | GET /proxy
+   v
+Node.js / Express
+   |
+   | fetch('https://www.google.com/')
+   v
+Google
+   |
+   | HTML response
+   v
+Node.js / Express
+   |
+   | res.send(result)
+   v
+Browser</code></pre>
+
+        <p>
+            The browser has not made the request to Google in this example. It made
+            a request to our Node.js server. It is the Node.js server that then
+            becomes a client and makes the request to Google.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="package-json-npm">package.json and npm</h2>
+
+        <p>
+            A Node.js project can have a <code>package.json</code> file containing
+            information and configuration about the project. It can for example
+            contain metadata about the project and information about its
+            dependencies.
+        </p>
+
+        <p>
+            A <code>package.json</code> can be created with <code>npm init</code>.
+            We can also use:
+        </p>
+
+        <pre><code>npm init -y</code></pre>
+
+        <p>
+            The <code>-y</code> option accepts the default values instead of asking
+            questions about the project one at a time.
+        </p>
+
+        <h3>Project metadata</h3>
+
+        <p>
+            Some properties describe the project itself:
+        </p>
+
+        <pre><code>{
+    "name": "planter",
+    "version": "0.0.1",
+    "description": "A website for keeping track of plants care",
+    "license": "MIT",
+    "author": "Mr Code"
+}</code></pre>
+
+        <p>
+            <code>name</code> is the name of the project and
+            <code>version</code> is the version of the project. Other properties
+            can contain information such as a description, license and author.
+        </p>
+
+        <h3>Dependencies</h3>
+
+        <p>
+            Packages that the project depends on can be listed under
+            <code>dependencies</code>:
+        </p>
+
+        <pre><code>{
+    "dependencies": {
+        "express": "^5.2.1"
+    }
+}</code></pre>
+
+        <p>
+            In this example Express is a dependency of the project. The version
+            number also tells npm which versions can be installed.
+        </p>
+
+        <p>
+            If the version is written without a symbol:
+        </p>
+
+        <pre><code>"express": "5.2.1"</code></pre>
+
+        <p>
+            the dependency is pinned to that exact version. With the caret:
+        </p>
+
+        <pre><code>"express": "^5.2.1"</code></pre>
+
+        <p>
+            compatible newer minor and patch versions can be installed, while the
+            major version stays at version 5.
+        </p>
+
+        <h3>Installing dependencies</h3>
+
+        <p>
+            Express can be installed with:
+        </p>
+
+        <pre><code>npm install express</code></pre>
+
+        <p>
+            If the dependencies are already described in
+            <code>package.json</code>, they can be installed with:
+        </p>
+
+        <pre><code>npm install</code></pre>
+
+        <p>
+            Writing a dependency in <code>package.json</code> describes that the
+            project needs the dependency. It does not by itself download the
+            package. <code>npm install</code> performs the installation.
+        </p>
+
+        <h3>ES Module configuration</h3>
+
+        <p>
+            <code>package.json</code> can also contain configuration that changes
+            how Node.js treats the JavaScript files in the project:
+        </p>
+
+        <pre><code>{
+    "type": "module"
+}</code></pre>
+
+        <p>
+            As described earlier, this tells Node.js that the
+            <code>.js</code> files in the package should be considered ES Modules.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="serverless-memory">Serverless and in-memory data</h2>
+
+        <p>
+            During development we can store data in a variable on the server:
+        </p>
+
+        <pre><code>const animals = [
+    { id: 1, name: 'Cat' }
+];
+
+app.post('/api/animals', (req, res) => {
+    animals.push(req.body);
+
+    res.send({
+        data: req.body
+    });
+});</code></pre>
+
+        <p>
+            When the local Node.js server keeps running, the same process stays in
+            memory. If the animals array is mutated, later requests to that running
+            process can therefore see the changed array.
+        </p>
+
+        <p>
+            If the process is
+            restarted, the variables are created again from the code and the changes
+            to the array are lost.
+        </p>
+
+        <h3>Serverless deployment</h3>
+
+        <p>
+            With serverless deployment the application does not have a server process
+            running all the time. A server instance can instead be started when it is
+            needed to handle a request and shut down again afterwards.
+        </p>
+
+        <p>
+            Because of this we cannot expect variables on the server to persist between
+            requests. A later request can be handled without the state that was created
+            by an earlier request.
+        </p>
+
+        <p>
+            An in-memory array is therefore useful while learning how CRUD and REST
+            endpoints work, but it should not be treated as persistent storage in
+            serverless deployment.
+        </p>
+    </section>
+</article>

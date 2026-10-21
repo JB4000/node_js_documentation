@@ -1,38 +1,468 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Express & HTTP</title>
-    <link rel="stylesheet" href="/pico/pico.min.css">
-    <link rel="stylesheet" href="/styles/main.css">
-</head>
-
-<body>
-    <header>
-        <p>Node.js Course Documentation</p>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/javascript">JavaScript</a></li>
-                <li><a href="/nodejs">Node.js & Tools</a></li>
-                <li><a href="/express">Express & HTTP</a></li>
-                <li><a href="/rest-api">REST APIs</a></li>
-                <li><a href="/frontend-security">Frontend & Security</a></li>
-                <li><a href="/modules-deployment">Modules, Static Files & Deployment</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
+<article class="documentation-content">
+    <section>
         <h1>Express & HTTP</h1>
-    </main>
 
-    <footer>
-        <p>This is the footer</p>
-    </footer>
+        <p>
+            Express is a framework for Node.js that we use to create a web server and
+            handle HTTP requests. A client can send a request to the server, the server
+            can run code based on the request, and then send a response back to the client.
+        </p>
 
-</body>
+        <p>
+            In this course the client will be a browser or another program making
+            HTTP requests, while our Node.js application running Express is the server.
+        </p>
+    </section>
 
-</html>
+    <section>
+        <h2 id="express-server">Creating an Express server</h2>
+
+        <p>
+            Express first has to be imported into the project. We can then create an
+            Express application and tell it which port to listen on.
+        </p>
+
+        <pre><code>
+            const express = require("express");  // Our initial CommonJS approach
+            const app = express();
+
+            app.listen(8080);
+        </code></pre>
+
+        <p>
+            <code>express()</code> creates the server by creating an instance of Express.
+            <code>app.listen(8080)</code> makes the server listen for
+            requests on port 8080.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="routes-callbacks">Routes and callbacks</h2>
+
+        <p>
+            We define routes to decide what the server should do when it receives
+            different HTTP requests.
+        </p>
+
+        <pre><code>
+            app.get("/animals", (req, res) => {
+                res.send({ data: animals });
+            });
+        </code></pre>
+
+        <p>
+            <code>app.get()</code> takes two arguments in this example. The first is the
+            endpoint path <code>"/animals"</code>. The second is a callback function.
+            Express can call the callback when a GET request matching that path is received.
+        </p>
+
+        <p>
+            <code>req</code> and <code>res</code> are parameters of the callback function.
+            They are not arguments that we supply when defining the route. Express calls
+            the function and provides the request and response objects.
+        </p>
+
+        <p>
+            The request object <code>req</code> contains information about the request
+            from the client. The response object <code>res</code> is used when sending
+            the response back to the client.
+        </p>
+
+        <pre><code>
+            res.send({ data: animals });
+        </code></pre>
+
+        <p>
+            In this example <code>res.send()</code> sends an object as the HTTP response.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="url-anatomy">Anatomy of a URL</h2>
+
+        <p>
+            Different parts of a URL have different purposes. For example:
+        </p>
+
+        <pre><code>
+            http://localhost:8080/animals/7?includeHabitat=true
+        </code></pre>
+
+        <p>
+            This URL can be divided into these parts:
+        </p>
+
+        <ul>
+            <li><code>http</code> - protocol</li>
+            <li><code>localhost</code> - hostname</li>
+            <li><code>8080</code> - port</li>
+            <li><code>/animals/7</code> - endpoint path</li>
+            <li><code>?includeHabitat=true</code> - query string</li>
+        </ul>
+
+        <p>
+            The path and query string can both be used to send information to the server,
+            but they are used in different ways.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="path-parameters">Path parameters</h2>
+
+        <p>
+            A route can contain a variable part of the path. In Express we define this
+            using a colon.
+        </p>
+
+        <pre><code>
+            app.get("/animals/:id", (req, res) => {
+                console.log(req.params.id);
+            });
+        </code></pre>
+
+        <p>
+            If the client requests <code>/animals/7</code>, the value
+            <code>"7"</code> is available as <code>req.params.id</code>. Values received
+            from the URL are strings, so we can explicitly convert the value when we need
+            a number.
+        </p>
+
+        <pre><code>
+            const id = Number(req.params.id);
+        </code></pre>
+
+        <p>
+            The name <code>id</code> comes from <code>:id</code> in the route definition.
+            A route can also contain more than one path parameter.
+        </p>
+
+        <pre><code>
+            app.get("/beers/:beerType/:amount", (req, res) => {
+                res.send({
+                    data: `You ordered ${req.params.amount} of ${req.params.beerType}`
+                });
+            });
+        </code></pre>
+    </section>
+
+    <section>
+        <h2 id="query-parameters">Query parameters</h2>
+
+        <p>
+            Query parameters are written after <code>?</code> in the URL. More than one
+            query parameter can be separated with <code>&</code>.
+        </p>
+
+        <pre><code>
+            /animals?habitat=water&limit=10
+        </code></pre>
+
+        <p>
+            Express makes the query parameters available through <code>req.query</code>.
+        </p>
+
+        <pre><code>
+            app.get("/animals", (req, res) => {
+                console.log(req.query.habitat);
+                console.log(req.query.limit);
+            });
+        </code></pre>
+
+        <p>
+            Path parameters are useful when a value identifies a particular resource.
+            Query parameters can be used for additional options about the request, for
+            example filtering.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="request-body">Sending data in the request body</h2>
+
+        <p>
+            Not all data is in the URL. A client can also send data in the
+            body of an HTTP request. For example when creating an animal.
+        </p>
+
+        <pre><code>
+            {
+                "name": "Otter",
+                "age": 4
+            }
+        </code></pre>
+
+        <p>
+            If the body, like in this case, contains JSON, Express needs middleware that parses the JSON
+            before we can work with it as a JavaScript object.
+        </p>
+
+        <pre><code>
+            app.use(express.json());
+        </code></pre>
+
+        <p>
+            <code>express.json()</code> is middleware. It parses JSON from the request
+            body and makes the resulting JavaScript data available through
+            <code>req.body</code>.
+        </p>
+
+        <pre><code>
+            app.post("/animals", (req, res) => {
+                console.log(req.body.name);
+                console.log(req.body.age);
+            });
+        </code></pre>
+
+        <p>
+            In this example <code>req.body.name</code> and <code>req.body.age</code>
+            access properties from the JavaScript object created by parsing the JSON body.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="request-data">Where request data is found</h2>
+
+        <p>
+            The location of data in the request determines where we read it in Express.
+            The placement depends on the type of request.
+        </p>
+
+        <pre><code>
+            req.params
+            req.query
+            req.body
+        </code></pre>
+
+        <ul>
+            <li>
+                <code>req.params</code> contains values from path parameters.
+            </li>
+            <li>
+                <code>req.query</code> contains values from the query string.
+            </li>
+            <li>
+                <code>req.body</code> contains parsed data from the request body.
+            </li>
+        </ul>
+
+        <p>
+            For example, a GET request will often carry information in the path or query
+            string, while a POST request will often carry data in the body.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="redirects">Redirects</h2>
+
+        <p>
+            A redirect sends the user from one URL to another.
+            We can navigate to another page in the browser, or
+            the server can tell the browser to make a new request
+            to a different URL.
+        </p>
+
+        <section>
+            <h3>Navigation in the browser</h3>
+
+            <p>
+                One way to navigate to another page is
+                by using a link in HTML.
+            </p>
+
+            <pre><code>
+            &lt;a href="/"&gt;Go to frontpage&lt;/a&gt;
+        </code></pre>
+
+            <p>
+                When the user clicks the link, the browser
+                navigates to the URL in the href attribute.
+            </p>
+
+            <p>
+                We can also navigate using JavaScript.
+            </p>
+
+            <pre><code>
+            window.location.href = '/'';
+            location.href = '/';
+        </code></pre>
+
+            <p>
+                This changes the current URL and navigates to
+                the frontpage. The previous page normally remains
+                in the browser history, so it is possible to go back in the browser.
+            </p>
+
+            <p>
+                Another option is <code>location.replace()</code>.
+            </p>
+
+            <pre><code>
+            window.location.replace('/'');
+            location.replace('/');
+        </code></pre>
+
+            <p>
+                This replaces the current history entry, so the
+                user normally cannot return to that entry using
+                the browser's back button.
+            </p>
+        </section>
+
+        <section>
+            <h3>Meta refresh and delayed navigation</h3>
+
+            <p>
+                There are other ways to navigate to another page
+                from the browser. We can use a meta refresh tag in HTML
+                or JavaScript with a delay.
+            </p>
+
+            <section>
+                <h4>Meta refresh</h4>
+
+                <p>
+                    A meta refresh tag can tell the browser to navigate
+                    to another URL after a specified number of seconds.
+                    The tag is placed inside the HTML head.
+                </p>
+
+                <pre><code>
+            &lt;head&gt;
+                &lt;meta http-equiv="refresh" content="3;url=/"&gt;
+            &lt;/head&gt;
+        </code></pre>
+
+                <p>
+                    In this example, the browser waits three seconds before
+                    navigating to the frontpage.
+                </p>
+
+                <p>
+                    The value before the semicolon is the delay in
+                    seconds, and the URL is the destination.
+                </p>
+
+                <p>
+                    Meta refresh works without JavaScript, but we
+                    will typically use a normal link for navigation
+                    or an HTTP redirect when a page has moved.
+                </p>
+            </section>
+
+            <section>
+                <h4>Delayed navigation with setTimeout</h4>
+
+                <p>
+                    We can use <code>setTimeout()</code> in JavaScript
+                    when we want to run code after a delay.
+                </p>
+
+                <pre><code>
+            setTimeout(() => {
+                location.href = "/";
+            }, 3000);
+        </code></pre>
+
+                <p>
+                    <code>setTimeout()</code> takes a callback function
+                    and a delay in milliseconds.
+                </p>
+
+                <p>
+                    In this example, the callback runs after
+                    3000 milliseconds, which is three seconds.
+                    The callback then navigates to the frontpage.
+                </p>
+
+                <p>
+                    This delay could be used to show a message
+                    before navigating to another page.
+                </p>
+            </section>
+
+            <p>
+                Both examples make the browser navigate to another URL.
+                They are different from <code>res.redirect()</code>,
+                where Express sends an HTTP redirect response to the client.
+            </p>
+        </section>
+
+        <section>
+            <h3>Redirecting from Express</h3>
+
+            <p>
+                A server-side redirect happens when the server
+                responds to a request by telling the client
+                to request another URL.
+            </p>
+
+            <p>
+                In Express we can use <code>res.redirect()</code>.
+            </p>
+
+            <pre><code>
+            app.get("/old-page", (req, res) => {
+                res.redirect("/new-page");
+            });
+        </code></pre>
+
+            <p>
+                When a client requests <code>/old-page</code>,
+                Express responds with a redirect to
+                <code>/new-page</code>.
+            </p>
+
+            <p>
+                The browser can then make a new request to the
+                new URL.
+            </p>
+        </section>
+
+        <section>
+            <h3>HTTP redirect status codes</h3>
+
+            <p>
+                A server-side redirect uses an HTTP response
+                status code and a Location header to tell the
+                client where to go.
+            </p>
+
+            <p>
+                By default, <code>res.redirect()</code> uses
+                status code <code>302</code>, which is
+                a temporary redirect.
+            </p>
+
+            <pre><code>
+            res.redirect("/new-page");
+        </code></pre>
+
+            <p>
+                We can also specify the status code ourselves.
+                For example, <code>301</code> means that
+                a resource has moved permanently.
+            </p>
+
+            <pre><code>
+            res.redirect(301, "/new-page");
+        </code></pre>
+
+            <p>
+                A redirect response includes a Location header
+                with the destination URL.
+            </p>
+
+            <pre><code>
+            HTTP/1.1 302 Found
+            Location: /new-page
+        </code></pre>
+
+            <p>
+                The important difference is that the server
+                does not send the content of the new page
+                directly in this response. It tells the client
+                where to make another request.
+            </p>
+        </section>
+    </section>
+</article>

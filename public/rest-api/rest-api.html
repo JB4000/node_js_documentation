@@ -1,37 +1,371 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REST APIs</title>
-    <link rel="stylesheet" href="/pico/pico.min.css">
-    <link rel="stylesheet" href="/styles/main.css">
-</head>
-
-<body>
-    <header>
-        <p>Node.js Course Documentation</p>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/javascript">JavaScript</a></li>
-                <li><a href="/nodejs">Node.js & Tools</a></li>
-                <li><a href="/express">Express & HTTP</a></li>
-                <li><a href="/rest-api">REST APIs</a></li>
-                <li><a href="/frontend-security">Frontend & Security</a></li>
-                <li><a href="/modules-deployment">Modules, Static Files & Deployment</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
+<article class="documentation-content">
+    <section>
         <h1>REST APIs</h1>
-    </main>
 
-    <footer>
-        <p>This is the footer</p>
-    </footer>
-</body>
+        <p>
+            A REST API gives a structured way of working with resources on a
+            server using HTTP. In the first REST API in the course we keep the data in
+            an array instead of using a database. We focus on the
+            routes and the HTTP requests before possibly adding persistence later.
+        </p>
+    </section>
 
-</html>
+    <section>
+        <h2 id="rest-conventions">REST conventions</h2>
+
+        <p>
+            We use conventions when designing REST endpoints. The HTTP method should
+            describe the action and the endpoint should describe the resource.
+        </p>
+
+        <p>
+            Rule for the course: use nouns in plural for collections. For a collection
+            of animals we therefore use <code>/animals</code> instead of something like
+            <code>/getAnimals</code>.
+        </p>
+
+        <pre><code>
+            GET /animals
+            GET /animals/:id
+            POST /animals
+            PUT /animals/:id
+            PATCH /animals/:id
+            DELETE /animals/:id
+        </code></pre>
+
+        <p>
+            The HTTP method shows what kind of operation is requested, so we
+            do not need to put the operation into the endpoint name.
+        </p>
+
+        <p>
+            The order of the endpoint should also follow the structure of the resources.
+            A specific animal belongs to the animals collection, so its id comes after
+            <code>/animals</code>.
+        </p>
+
+        <pre><code>
+            /animals/:id
+        </code></pre>
+    </section>
+
+    <section>
+        <h2 id="crud-http-methods">CRUD and HTTP methods</h2>
+
+        <p>
+            CRUD stands for Create, Read, Update and Delete. These operations can be
+            connected to HTTP methods when designing a REST API.
+        </p>
+
+        <ul>
+            <li><code>POST</code> - Create</li>
+            <li><code>GET</code> - Read</li>
+            <li><code>PATCH</code> or <code>PUT</code> - Update</li>
+            <li><code>DELETE</code> - Delete</li>
+        </ul>
+
+        <p>
+            The same resource path can therefore be used with different HTTP methods.
+            The combination of the HTTP method and endpoint tells the server which
+            operation is requested.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="reading-resources">Reading resources</h2>
+
+        <section>
+            <h3>Getting the collection</h3>
+
+            <p>
+                A GET request to <code>/animals</code> can return the complete collection.
+            </p>
+
+            <pre><code>
+                app.get("/animals", (req, res) => {
+                    res.send({ data: animals });
+                });
+            </code></pre>
+        </section>
+
+        <section>
+            <h3>Getting one resource</h3>
+
+            <p>
+                When we want one specific animal, the id can be part of the endpoint path.
+                The path parameter from the URL is a string, while the ids in our animal
+                objects are numbers. We therefore convert the provided id before comparing
+                it with strict equality.
+            </p>
+
+            <pre><code>
+                app.get("/animals/:id", (req, res) => {
+                    const providedId = Number(req.params.id);
+
+                    const foundAnimal = animals.find(
+                        (animal) => animal.id === providedId
+                    );
+
+                    if (!foundAnimal) {
+                        return res.status(404).send({
+                            errorMessage: `No animal found by id ${providedId}`
+                        });
+                    }
+
+                    res.send({ data: foundAnimal });
+                });
+            </code></pre>
+
+            <p>
+                <code>find()</code> returns the first element that matches the condition.
+                If no animal matches, it returns <code>undefined</code>.
+            </p>
+
+            <p>
+                In that situation the server sends status code <code>404</code>, meaning
+                Not Found.
+            </p>
+        </section>
+    </section>
+
+    <section>
+        <h2 id="one-request-one-response">One request should get one response</h2>
+
+        <p>
+            After sending the 404 response we use <code>return</code>.
+        </p>
+
+        <pre><code>
+            if (!foundAnimal) {
+                return res.status(404).send({
+                    errorMessage: `No animal found by id ${providedId}`
+                });
+            }
+        </code></pre>
+
+        <p>
+            <code>res.status(404).send()</code> sends the response.
+            <code>return</code> is used to stop execution of the route callback afterwards.
+            Without stopping the function, later code could continue and try to send
+            another response for the same request.
+        </p>
+
+        <p>
+            Rule for the course: one request should have one response.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="creating-resource">Creating a resource</h2>
+
+        <p>
+            A POST request can be used to create a new animal. At this stage of the
+            course we do not have a database, so an incrementing variable is used to
+            imitate an automatically generated id in a relational database.
+        </p>
+
+        <pre><code>
+            let nextId = 3;
+        </code></pre>
+
+        <p>
+            If the existing animals have ids 1 and 2, the next created animal can get
+            id 3. The variable is then incremented so it is ready for the next animal.
+        </p>
+
+        <pre><code>
+            app.post("/animals", (req, res) => {
+                const providedAnimal = req.body;
+
+                providedAnimal.id = nextId++;
+
+                animals.push(providedAnimal);
+
+                res.send({ data: providedAnimal });
+            });
+        </code></pre>
+
+        <p>
+            The JSON body has
+            already been parsed by <code>express.json()</code>, so the provided animal
+            can be accessed through <code>req.body</code>.
+        </p>
+
+        <p>
+            The server decides the id. We do not want a client to decide which id a new
+            resource should have.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="updating-patch">Updating a resource with PATCH</h2>
+
+        <p>
+            <code>PATCH</code> is used when we want to update only some properties of an
+            existing resource. Properties that were not supplied should still be kept.
+        </p>
+
+        <p>
+            First we find the index of the animal we want to update.
+        </p>
+
+        <pre><code>
+            const foundAnimalIndex = animals.findIndex(
+                (animal) => animal.id === providedId
+            );
+        </code></pre>
+
+        <p>
+            <code>findIndex()</code> returns the index of the first matching element.
+            If nothing matches, it returns <code>-1</code>. In that case we respond with 404.
+        </p>
+
+        <pre><code>
+            if (foundAnimalIndex === -1) {
+                return res.status(404).send({
+                    errorMessage: `No animal found by id ${providedId}`
+                });
+            }
+        </code></pre>
+
+        <p>
+            If an index was found we can then create a new object containing the existing values and the
+            supplied changes.
+        </p>
+
+        <pre><code>
+            const animalToCreate = {
+                ...foundAnimal,
+                ...providedAnimal,
+                id: providedId
+            };
+        </code></pre>
+
+        <p>
+            The spread operator spreads the properties from an object into the new
+            object. Properties can occur more than once while the object is being created.
+            If that happens, the last value is the one that is kept.
+        </p>
+
+        <p>
+            That is why the order is important. The existing animal is added first. The
+            properties supplied by the client come afterwards and can override the old
+            values. Finally <code>id: providedId</code> overrides any id that might have
+            been in the request body. We should only use ids from path variables.
+        </p>
+
+        <pre><code>
+            app.patch("/animals/:id", (req, res) => {
+                const providedId = Number(req.params.id);
+
+                const foundAnimalIndex = animals.findIndex(
+                    (animal) => animal.id === providedId
+                );
+
+                if (foundAnimalIndex === -1) {
+                    return res.status(404).send({
+                        errorMessage: `No animal found by id ${providedId}`
+                    });
+                }
+
+                const providedAnimal = req.body;
+                const foundAnimal = animals[foundAnimalIndex];
+
+                const animalToCreate = {
+                    ...foundAnimal,
+                    ...providedAnimal,
+                    id: providedId
+                };
+
+                animals[foundAnimalIndex] = animalToCreate;
+
+                res.send({ data: animalToCreate });
+            });
+        </code></pre>
+
+        <p>
+            The <code>animals</code> variable does not have to be reassigned. The array
+            itself is mutated by changing which object reference is stored at the found
+            index.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="put-patch">PUT and PATCH</h2>
+
+        <p>
+            PATCH and PUT are both connected to updating resources, but we have discussed
+            an important distinction between them in class.
+        </p>
+
+        <p>
+            <code>PATCH</code> is a partial update. We send the properties that should
+            change and preserve the other properties of the existing resource.
+        </p>
+
+        <p>
+            The strict PUT approach explained in class treats PUT as replacement. The old
+            database row is deleted, including its id, and a new row is created from the
+            supplied data with a new id.
+        </p>
+
+        <p>
+            We also discussed that PUT is often not implemented that strictly in practice.
+            It is common to see it used to update all the values of an existing resource
+            while keeping its id. This makes the practical implementation look closer to
+            an update than the strict replacement approach discussed in class.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="deleting-resource">Deleting a resource</h2>
+
+        <p>
+            DELETE is used to remove a resource. Again we first find the index of the
+            animal with the requested id.
+        </p>
+
+        <pre><code>
+            app.delete("/animals/:id", (req, res) => {
+                const providedId = Number(req.params.id);
+
+                const foundAnimalIndex = animals.findIndex(
+                    (animal) => animal.id === providedId
+                );
+
+                if (foundAnimalIndex === -1) {
+                    return res.status(404).send({
+                        errorMessage: `No animal found by id ${providedId}`
+                    });
+                }
+
+                animals.splice(foundAnimalIndex, 1);
+
+                res.status(204).send();
+            });
+        </code></pre>
+
+        <p>
+            <code>splice()</code> mutates the array. The first argument is the index where
+            the operation starts and the second argument is the number of elements to
+            remove. In this case one animal is removed.
+        </p>
+
+        <p>
+            The response uses status code <code>204</code>. The resource was successfully
+            deleted and there is no response body to send back. We could choose to send the 
+            deleted animal back and use status code <code>200</code> instead.
+        </p>
+    </section>
+
+    <section>
+        <h2 id="in-memory-api">The in-memory API is temporary</h2>
+
+        <p>
+            The animals array and the <code>nextId</code> variable let us practice
+            without a database. The data only exists in the running
+            Node.js process, so restarting the server resets the data.
+        </p>
+
+    </section>
+</article>
