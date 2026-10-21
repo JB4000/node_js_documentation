@@ -62,7 +62,9 @@ export function createSubjectGroups(currentRoute) {
 
         return `<li>
     <details data-route="${page.route}">
-        <summary>${page.title}</summary>
+        <summary>
+    <a href="${page.route}" onclick="event.stopPropagation()">${page.title}</a>
+</summary>
         <ul>
             ${sectionLinks}
         </ul>
