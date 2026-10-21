@@ -54,11 +54,32 @@ body:has(.documentation-sidebar) main > .mobile-navigation {
     max-height: calc(100vh - 6rem);
     overflow-y: auto;
     overscroll-behavior-y: contain;
+
+    background-color: var(--pico-color-blue-50);
+    border: 2px solid var(--pico-color-blue-100);
+    border-radius: var(--pico-border-radius);
 }
 
-body:has(.documentation-sidebar) main > .documentation-content {
+body:has(.documentation-sidebar) main > .documentation-panel {
     grid-column: 2;
     min-width: 0;
+}
+
+.documentation-panel {
+    background: var(--pico-card-background-color);
+    /* border: 1px solid var(--pico-card-border-color);
+    border-radius: var(--pico-border-radius); */
+    padding: 0.2em;
+}
+
+/* for the subject headers in sidebar. For all states of collapsing etc */
+.documentation-sidebar details > summary {
+    --pico-accordion-active-summary-color: var(--pico-color-blue-500);
+    --pico-accordion-open-summary-color: var(--pico-color-blue-500);
+    --pico-accordion-close-summary-color: var(--pico-color-blue-500);
+
+    color: var(--pico-color-blue-500);
+    font-weight: bold;
 }
 
 .documentation-sidebar nav ul {
@@ -73,6 +94,12 @@ body:has(.documentation-sidebar) main > .documentation-content {
 
 .documentation-sidebar nav a {
     white-space: normal;
+    color: var(--pico-color-blue-550);  
+}
+
+/* for main header in sidebar */
+.documentation-sidebar h2 {
+    color: var(--pico-color-blue-600);
 }
 
 /* for mobile and small screens */
@@ -100,14 +127,16 @@ body:has(.documentation-sidebar) main > .documentation-content {
     position: sticky;
     top: 0;
     z-index: 10;
-    background-color: var(--pico-background-color);
+    background-color: var(--pico-color-blue-50);
     padding: 1rem;
-    border-bottom: 1px solid var(--pico-muted-border-color);
+    border-bottom: 2px solid var(--pico-color-blue-100);
+    color: var(--pico-color-blue-550);
 }
 
 .site-header a {
     text-decoration: none;
     font-weight: bold;
+    color: inherit;
 }
 
 /* for desktop */
@@ -134,6 +163,20 @@ body:has(.documentation-sidebar) main > .documentation-content {
     scroll-margin-top: 5rem;
 }
 
+/* make headers that end up i sidebar more visible */
+.documentation-content h2 {
+    border-top: 1px solid var(--pico-muted-border-color);
+    border-bottom: 1px solid var(--pico-muted-border-color);
+    padding-top: 0.5rem;
+    padding-bottom: 0.7rem;
+}
+
+/* a border to frame the code blocks */
+.documentation-content pre {
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+}
+
 /* footer */
 .site-footer {
     display: flex;
@@ -142,9 +185,12 @@ body:has(.documentation-sidebar) main > .documentation-content {
     gap: 1rem;
     flex-wrap: wrap;
     padding: 1rem;
-    border-top: 1px solid var(--pico-muted-border-color);
+    background-color: var(--pico-color-blue-100);
+    border-top: 2px solid var(--pico-color-blue-150);
+    color: var(--pico-color-blue-400);
 }
 
 .site-footer a {
     text-decoration: none;
+    color: inherit;
 }
